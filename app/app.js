@@ -93,3 +93,5 @@ function setupVisibilityTitleChanger() {
 
     document.addEventListener('visibilitychange', eventListener);
 }
+
+setupVisibilityTitleChanger()
