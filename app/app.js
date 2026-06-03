@@ -1,3 +1,7 @@
+function initFuncs() {
+    setupVisibilityTitleChanger();
+}
+
 function setupVisibilityTitleChanger() {
     var waitTimer = null;
     var awayTime = null;
@@ -94,4 +98,6 @@ function setupVisibilityTitleChanger() {
     document.addEventListener('visibilitychange', eventListener);
 }
 
-setupVisibilityTitleChanger()
+document.addEventListener('DOMContentLoaded', function() {
+    initFuncs();
+});
