@@ -61,11 +61,8 @@ function getDevicePerformanceLevel() {
 const level = getDevicePerformanceLevel();
 console.log(`[性能级别] ${level}`);
 
-// test
-if (level === 'basic') {
-    alert('您的设备性能较低，将启用基础模式以保证流畅体验。');
-} else if (level === 'full') {
-    alert('您的设备性能良好，支持完整功能。');
-} else if (level === 'trial') {
-    alert('您的浏览器支持 WebGPU 等前沿特性，可体验最新实验功能！');
+if (level == 'trial') {
+    window.location.replace('./app/full/main.html?upnotice')
+} else {
+    window.location.replace(`./app/${level}/main.html`)
 }
