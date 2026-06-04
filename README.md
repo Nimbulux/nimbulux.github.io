@@ -14,7 +14,7 @@
 
 ### 内容（文章与笔记）
 
-所有 `_posts` 目录下的文章、笔记及图片等原创内容，均采用 [知识共享 署名-非商业性使用-禁止演绎 4.0 国际 (CC BY-NC-ND 4.0)](https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en) 许可。  
+所有 `app/posts` 目录下的文章、笔记及图片等原创内容，均采用 [知识共享 署名-非商业性使用-禁止演绎 4.0 国际 (CC BY-NC-ND 4.0)](https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en) 许可。  
 你可以自由分享，但必须署名，不可商用，且不能修改。
 
 ---
