@@ -1,7 +1,3 @@
-/**
- * 获取设备性能级别
- * @returns {'basic' | 'full' | 'trial'} 性能级别
- */
 function getDevicePerformanceLevel() {
     const isFunctionSupported = (fn) => typeof fn === 'function';
     const hasCssSupport = (prop, value) => CSS && CSS.supports && CSS.supports(prop, value);
@@ -58,11 +54,25 @@ function getDevicePerformanceLevel() {
     return 'full';
 }
 
-const level = getDevicePerformanceLevel();
-console.log(`[性能级别] ${level}`);
-
-if (level == 'trial') {
-    window.location.replace('./app/full/main.html?upnotice')
-} else {
-    window.location.replace(`./app/${level}/main.html`)
+async function loadContent(internalURL) {
+    try {
+        const response = await fetch(internalURL);
+        if (!response.ok) throw new Error(`请求失败: ${response.status}`);
+        const pageHTML = await response.text();
+        document.getElementById('main-page').innerHTML = pageHTML;
+    } catch (error) {
+        console.error(error);
+        document.getElementById('main-page').innerHTML = '<p>内容加载失败</p>';
+    }
 }
+
+async function loadContent(internalURL) {
+    const response = await fetch(internalURL);
+    const pageHTML = await response.text();
+    document.getElementById('main-page').innerHTML = pageHTML;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    //jumpPage();
+    loadContent('./app/basic/index.html')
+});

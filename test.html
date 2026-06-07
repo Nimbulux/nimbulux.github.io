@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Markdown 渲染器 · 带目录跳转</title>
+    <!-- marked: 轻量级 Markdown 解析器 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- DOMPurify: 防御 XSS 攻击 -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.4/dist/purify.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            background: #f6f9fc;
+            padding: 2rem 1.5rem;
+            color: #1e2a3e;
+        }
+
+        /* 整体布局：左右双栏（大屏），小屏时改为上下 */
+        .app {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        /* 头部 */
+        .header {
+            background: linear-gradient(135deg, #1f2b3c, #0f1a24);
+            color: white;
+            padding: 1.2rem 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .header h1::before {
+            content: "📄";
+            font-size: 1.8rem;
+        }
+        .header p {
+            opacity: 0.8;
+            margin-top: 8px;
+            font-size: 0.9rem;
+        }
+
+        /* 双栏容器 */
+        .two-columns {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        /* 左侧：编辑器 + 目录区  (可编辑，适合本地修改) */
+        .sidebar {
+            flex: 1.2;
+            min-width: 280px;
+            background: #fefefe;
+            border-right: 1px solid #e4e9f0;
+            display: flex;
+            flex-direction: column;
+            height: auto;
+        }
+
+        .editor-section {
+            padding: 1.5rem;
+            border-bottom: 1px solid #eef2f6;
+        }
+        .editor-section label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.8rem;
+            color: #1e466e;
+        }
+        textarea {
+            width: 100%;
+            min-height: 380px;
+            padding: 1rem;
+            font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            border: 1px solid #cfdfed;
+            border-radius: 1rem;
+            background: #ffffff;
+            resize: vertical;
+            outline: none;
+            transition: 0.2s;
+        }
+        textarea:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+        }
+
+        /* 目录列表样式 (跳转核心) */
+        .toc-section {
+            padding: 1.2rem 1.5rem 1.5rem;
+            background: #f9fbfd;
+            border-top: 1px solid #e4e9f0;
+        }
+        .toc-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #2c5a8c;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .toc-list {
+            list-style: none;
+            max-height: 380px;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+        .toc-list li {
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+        .toc-list a {
+            text-decoration: none;
+            color: #2c3e66;
+            display: inline-block;
+            padding: 0.2rem 0;
+            transition: all 0.2s;
+            border-left: 2px solid transparent;
+            padding-left: 8px;
+        }
+        .toc-list a:hover {
+            color: #1e40af;
+            border-left-color: #3b82f6;
+            background: #eef2ff;
+            padding-left: 12px;
+        }
+        /* 不同层级缩进 */
+        .toc-h2 { margin-left: 0.8rem; }
+        .toc-h3 { margin-left: 1.6rem; }
+        .toc-h4 { margin-left: 2.2rem; }
+        .toc-h5 { margin-left: 2.8rem; }
+        .toc-h6 { margin-left: 3.2rem; }
+
+        /* 右侧预览区 */
+        .preview-area {
+            flex: 2.5;
+            min-width: 320px;
+            background: white;
+            padding: 1.8rem 2rem;
+            overflow-y: auto;
+            max-height: 85vh;
+        }
+
+        /* Markdown 渲染内容样式 (优雅阅读) */
+        .markdown-body {
+            font-size: 1rem;
+            line-height: 1.65;
+            color: #1f2937;
+        }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+            margin-top: 1.8rem;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+            scroll-margin-top: 1rem;  /* 平滑滚动偏移量，避免被固定栏挡住 */
+        }
+        .markdown-body h1 { font-size: 2rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.3rem; }
+        .markdown-body h2 { font-size: 1.6rem; border-bottom: 1px solid #e9edf2; padding-bottom: 0.2rem; }
+        .markdown-body h3 { font-size: 1.35rem; }
+        .markdown-body h4 { font-size: 1.2rem; }
+        .markdown-body p { margin-bottom: 1rem; }
+        .markdown-body a { color: #2563eb; text-decoration: none; border-bottom: 1px solid #bfdbfe; }
+        .markdown-body a:hover { color: #1e40af; border-bottom-color: #1e40af; }
+        .markdown-body ul, .markdown-body ol { margin: 0.5rem 0 1rem 1.8rem; }
+        .markdown-body li { margin: 0.2rem 0; }
+        .markdown-body blockquote {
+            border-left: 4px solid #3b82f6;
+            background: #f8fafc;
+            margin: 1rem 0;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0 12px 12px 0;
+            color: #2d3a4b;
+        }
+        .markdown-body code {
+            font-family: 'SF Mono', monospace;
+            background: #eef2ff;
+            padding: 0.2rem 0.4rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #b91c1c;
+        }
+        .markdown-body pre {
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 1rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        .markdown-body pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        .markdown-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        .markdown-body th, .markdown-body td {
+            border: 1px solid #cbd5e1;
+            padding: 0.5rem 0.8rem;
+        }
+        .markdown-body th {
+            background: #f1f5f9;
+        }
+        .markdown-body img {
+            max-width: 100%;
+            border-radius: 12px;
+            margin: 0.5rem 0;
+        }
+        .markdown-body hr {
+            margin: 1.8rem 0;
+            border: none;
+            height: 2px;
+            background: linear-gradient(90deg, #cbd5e6, #94a3b8, #cbd5e6);
+        }
+
+        /* 响应式 (手机：上下结构) */
+        @media (max-width: 800px) {
+            body { padding: 0.8rem; }
+            .two-columns { flex-direction: column; }
+            .sidebar { border-right: none; border-bottom: 1px solid #e2e8f0; }
+            .preview-area { max-height: 60vh; }
+        }
+
+        /* 提示 */
+        .info-note {
+            font-size: 0.7rem;
+            color: #5f7f9e;
+            margin-top: 0.6rem;
+            text-align: center;
+            border-top: 1px solid #eef2f8;
+            padding-top: 0.8rem;
+        }
+        button {
+            background: #eef2ff;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            color: #1e40af;
+        }
+        button:hover {
+            background: #dbeafe;
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+    <div class="header">
+        <h1>Markdown 本地渲染 · 目录跳转</h1>
+        <p>编辑左侧Markdown源文本 → 右侧即时预览 + 自动生成标题目录，点击目录任意项平滑滚动到对应位置</p>
+    </div>
+    <div class="two-columns">
+        <!-- 左侧面板：编辑区 + 目录跳转列表 -->
+        <div class="sidebar">
+            <div class="editor-section">
+                <label>
+                    <span>✏️</span> Markdown 源代码 (本地编辑)
+                </label>
+                <textarea id="markdownSource" placeholder="在此编写或粘贴 Markdown 内容……"></textarea>
+                <div class="info-note">
+                    💡 修改内容自动渲染，右侧实时更新。目录基于标题（# ~ ######）生成。
+                </div>
+            </div>
+            <div class="toc-section">
+                <div class="toc-title">
+                    <span>📑</span> 章节跳转 · 目录
+                </div>
+                <div id="tocContainer">
+                    <ul class="toc-list" id="dynamicToc">
+                        <li style="color:#94a3b8;">— 正在生成目录 —</li>
+                    </ul>
+                </div>
+                <div class="info-note" style="border-top: none; padding-top: 0.3rem;">
+                    🔗 点击列表项平滑跳转至对应标题
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧预览区：渲染后的 Markdown 内容 -->
+        <div class="preview-area" id="previewArea">
+            <div class="markdown-body" id="renderedContent">
+                <!-- 动态渲染结果将呈现在这里 -->
+                <div style="text-align:center; color:#6c86a3;">✨ 加载中，请稍后...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ---------- 配置 marked 解析器 ----------
+        if (typeof marked !== 'undefined') {
+            marked.use({
+                gfm: true,          // GitHub 风格 (表格、任务列表等)
+                breaks: true,       // 换行转 <br>
+                headerIds: true,    // 自动生成标题 id
+                mangle: false,
+            });
+        }
+
+        // DOM 元素
+        const textarea = document.getElementById('markdownSource');
+        const renderedDiv = document.getElementById('renderedContent');
+        const tocList = document.getElementById('dynamicToc');
+
+        // 默认示例 Markdown（包含多种标题层级，展示目录跳转效果）
+        const defaultMarkdown = `# 📌 项目文档示例
+
+欢迎使用 **Markdown 本地渲染器**。右侧内容由左侧实时生成，并自动构建标题目录。
+
+---
+
+## 🚀 快速开始
+
+你可以直接在左边编辑区修改任何文字，调整标题结构，右侧会立即刷新预览，**目录也会同步更新**。
+
+### 1.1 安装与运行
+这是一个三级标题示例。点击目录中的“1.1 安装与运行”可以平滑滚动到这里。
+
+\`\`\`bash
+# 本地无需安装依赖，打开 HTML 文件即可
+echo "Hello Markdown"
+\`\`\`
+
+### 1.2 目录跳转原理
+基于所有 \`<h1>\` 到 \`<h6>\` 的标签，自动提取文本和 id，生成可点击的列表。  
+点击后通过 \`scrollIntoView\` 实现平滑滚动，阅读体验更流畅。
+
+## 📚 高级功能
+
+### 表格支持 (GFM)
+| 特性       | 支持情况 | 说明                     |
+|------------|----------|--------------------------|
+| 标题跳转   | ✅       | 点击目录项自动定位       |
+| 代码高亮   | ✅       | 深色背景代码块           |
+| 嵌套列表   | ✅       | 有序/无序/任务列表       |
+
+### 嵌套列表示范
+- 一级列表项
+  - 二级列表项 A
+  - 二级列表项 B
+    - 三级缩进效果
+- 另一项
+
+> 提示：所有标题（# ## ### 等等）都会出现在左侧目录中，并且保持层级缩进。
+
+## 🎯 实战演练
+
+你可以尝试修改下方段落，增加新的标题，目录列表会立刻更新：
+
+#### 新增四级标题示例
+这是一个四级标题，目录区会新增对应条目，点击即可跳转。
+
+#### 另一个四级标题
+目录会自动按顺序排列，便于快速导航。
+
+---
+
+**最后**：所有外部链接将会在新标签页打开，并且渲染内容经过安全过滤 (DOMPurify)。
+
+祝使用愉快！ 🎉
+`;
+
+        // 生成安全的 id (用于锚点跳转，兼容中文)
+        function generateIdFromHeading(text) {
+            // 转为小写，移除特殊符号，保留中文与字母数字，空格替换为短横
+            let id = text.trim()
+                .toLowerCase()
+                .replace(/[^\u4e00-\u9fa5a-z0-9]+/g, '-')   // 中文、字母数字保留，其他符号变横线
+                .replace(/^-+|-+$/g, '');
+            // 如果id为空 (极端情况)，加随机后缀
+            if (!id) id = 'heading-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
+            // 避免重复 id 处理 (多次渲染时可能重复，但marked内部生成id也可能重复，我们追加去重逻辑简单处理)
+            return id;
+        }
+
+        // 存储当前所有标题的映射表，用于目录点击跳转 (避免动态查询不及时)
+        let headingElementsMap = new Map(); // key: id, value: DOM元素
+
+        // 构建目录 & 重新挂载标题id (确保每个标题都有唯一id)
+        function buildTocAndFixIds(htmlContent, containerElement) {
+            // 创建临时容器解析标题
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlContent;
+            const headings = tempDiv.querySelectorAll('h1, h2, h3, h4, h5, h6');
+            // 记录已经用过的id，避免冲突
+            const usedIds = new Set();
+            
+            headings.forEach((heading, idx) => {
+                let originalId = heading.getAttribute('id');
+                let finalId = originalId;
+                // 如果已经有id且不重复则保留；否则基于文本生成唯一id
+                if (!finalId || usedIds.has(finalId)) {
+                    let baseId = generateIdFromHeading(heading.innerText);
+                    finalId = baseId;
+                    let counter = 1;
+                    while (usedIds.has(finalId)) {
+                        finalId = `${baseId}-${counter++}`;
+                    }
+                    heading.setAttribute('id', finalId);
+                } else {
+                    // 有id但没有冲突，直接使用
+                    if (usedIds.has(finalId)) {
+                        // 极少情况冲突，追加后缀
+                        let counter = 1;
+                        while (usedIds.has(`${finalId}-${counter}`)) counter++;
+                        finalId = `${finalId}-${counter}`;
+                        heading.setAttribute('id', finalId);
+                    }
+                }
+                usedIds.add(finalId);
+            });
+            
+            // 获取修正后的完整HTML
+            const fixedHtml = tempDiv.innerHTML;
+            
+            // 生成目录树
+            const tocItems = [];
+            headings.forEach((heading) => {
+                const level = parseInt(heading.tagName[1]); // 1-6
+                const id = heading.getAttribute('id');
+                const text = heading.innerText;
+                tocItems.push({ level, id, text });
+            });
+            
+            // 渲染目录列表
+            renderTocList(tocItems);
+            
+            // 返回修正后的HTML
+            return fixedHtml;
+        }
+        
+        // 渲染目录列表 (支持层级缩进)
+        function renderTocList(items) {
+            if (!tocList) return;
+            if (!items || items.length === 0) {
+                tocList.innerHTML = '<li style="color:#94a3b8;">📭 未检测到标题，请添加 # ~ ###### 格式的标题</li>';
+                return;
+            }
+            const ul = document.createElement('ul');
+            ul.className = 'toc-list';
+            items.forEach(item => {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = `#${item.id}`;
+                a.textContent = item.text;
+                // 添加样式层级
+                a.classList.add(`toc-h${item.level}`);
+                // 阻止默认锚点跳转（避免url改变），使用平滑滚动代替
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetElement = document.getElementById(item.id);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start',
+                        });
+                        // 可选: 添加短暂高亮效果
+                        targetElement.style.transition = 'background 0.3s';
+                        targetElement.style.backgroundColor = '#fef9c3';
+                        setTimeout(() => {
+                            targetElement.style.backgroundColor = '';
+                        }, 800);
+                    } else {
+                        // 后备：有些标题可能因为动态刷新没有及时找到，手动尝试全局查找
+                        const fallback = document.querySelector(`#${CSS.escape(item.id)}`);
+                        if (fallback) fallback.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+                li.appendChild(a);
+                ul.appendChild(li);
+            });
+            // 替换原有内容
+            tocList.innerHTML = '';
+            tocList.appendChild(ul);
+        }
+        
+        // 安全渲染主函数: 解析 markdown -> 生成带有效ID的html -> 净化 -> 更新预览区 -> 构建目录
+        async function renderMarkdown(markdownText) {
+            if (!markdownText && markdownText !== '') markdownText = '';
+            try {
+                let rawHtml = '';
+                if (typeof marked.parse === 'function') {
+                    rawHtml = await marked.parse(markdownText);
+                } else if (typeof marked === 'function') {
+                    rawHtml = marked(markdownText);
+                } else {
+                    rawHtml = '<p style="color:red;">❌ Markdown 解析器加载失败，请刷新页面。</p>';
+                }
+                
+                // 第一步：使用 DOMPurify 基础净化 (移除危险脚本)
+                let safeHtml = DOMPurify.sanitize(rawHtml, {
+                    ALLOWED_TAGS: ['h1','h2','h3','h4','h5','h6','p','div','span','strong','b','em','i','u','strike','s','del','blockquote','code','pre','ul','ol','li','a','img','table','thead','tbody','tr','th','td','hr','br','section','article','figure','figcaption','caption','small'],
+                    ALLOWED_ATTR: ['href','src','alt','title','target','rel','class','id']
+                });
+                
+                // 第二步：通过临时DOM构建有效标题id + 生成目录
+                // 注意：此时safeHtml里的h标签可能没有id或重复id，我们调用buildTocAndFixIds完成id修正以及目录构建
+                const containerForFix = document.createElement('div');
+                // 获得带有效id的html，并且同时构建目录
+                const finalHtmlWithIds = buildTocAndFixIds(safeHtml, renderedDiv);
+                
+                // 确保预览区展示最终HTML，同时保留所有链接在新窗口打开
+                let finalHtmlForDisplay = finalHtmlWithIds;
+                // 额外安全加固: 为所有a标签添加target="_blank" (DOMPurify没有强制添加)
+                const tempDom = document.createElement('div');
+                tempDom.innerHTML = finalHtmlForDisplay;
+                const anchors = tempDom.querySelectorAll('a');
+                anchors.forEach(anchor => {
+                    if (!anchor.getAttribute('target')) {
+                        anchor.setAttribute('target', '_blank');
+                        anchor.setAttribute('rel', 'noopener noreferrer');
+                    }
+                });
+                finalHtmlForDisplay = tempDom.innerHTML;
+                
+                // 更新右侧预览区域
+                renderedDiv.innerHTML = finalHtmlForDisplay;
+                
+                // 为每个标题增加平滑滚动监听已经通过目录的点击事件完成，无需额外处理；但scroll-margin可以确保跳转后不被顶部遮挡
+                // 增加一个全局样式确保滚动偏移量
+                const style = document.createElement('style');
+                if (!document.querySelector('#dynamic-scroll-padding')) {
+                    style.id = 'dynamic-scroll-padding';
+                    style.textContent = `.markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4, .markdown-body h5, .markdown-body h6 { scroll-margin-top: 1.2rem; }`;
+                    document.head.appendChild(style);
+                }
+            } catch (err) {
+                console.error('渲染出错:', err);
+                renderedDiv.innerHTML = `<div style="color:#b91c1c; background:#fee2e2; padding:1rem; border-radius:12px;">⚠️ 解析错误: ${err.message}<br>请检查 Markdown 语法</div>`;
+                if (tocList) tocList.innerHTML = '<li>目录生成失败</li>';
+            }
+        }
+        
+        // 防抖动函数 (避免过于频繁)
+        let debounceTimer;
+        function handleInput() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                const source = textarea.value;
+                renderMarkdown(source).catch(e => console.warn(e));
+            }, 100);
+        }
+        
+        // 加载示例并绑定事件
+        if (textarea) {
+            // 设置默认示例文档
+            textarea.value = defaultMarkdown;
+            // 初次渲染
+            renderMarkdown(defaultMarkdown).catch(console.warn);
+            // 监听输入事件
+            textarea.addEventListener('input', handleInput);
+        }
+        
+        // 监听窗口resize之类无影响，但可以保证目录区域滚动正常
+        // 可选：如果用户点击目录时由于动态刷新导致元素丢失，二次安全保证
+        window.addEventListener('load', () => {
+            if (textarea && !textarea.value.trim()) {
+                textarea.value = defaultMarkdown;
+                renderMarkdown(defaultMarkdown);
+            }
+        });
+        
+        // 手动暴露刷新方法 (控制台可用)
+        window.refreshMarkdown = () => {
+            if (textarea) renderMarkdown(textarea.value);
+        };
+    })();
+</script>
+</body>
+</html>
