@@ -1,11 +1,11 @@
 // ==================== 应用状态 ====================
 const APP_STATE = {
-    postsData: null, // 存储 posts.json 的全部数据
-    currentPageId: null, // 当前文章 ID（如 "hello-world" 或 "docs/getting-started"）
-    currentRouteType: 'home', // 'home' | 'page' | 'docs'
-    isInIframe: false, // 是否在 iframe 中运行
-    basePath: '', // 部署基础路径
-    isLoading: false,
+    postsData: null,
+    currentPageId: null,
+    currentRouteType: 'home',
+    isInIframe: false,
+    basePath: '',
+    tocObserver: null,   // IntersectionObserver 实例
 };
 
 // ==================== DOM 元素缓存 ====================
@@ -27,7 +27,6 @@ const DOM = {
 
 // ==================== 初始化 ====================
 function initApp() {
-    // 缓存 DOM 元素
     DOM.sidebar = document.getElementById('sidebar');
     DOM.sidebarOverlay = document.getElementById('sidebarOverlay');
     DOM.hamburgerBtn = document.getElementById('hamburgerBtn');
@@ -42,15 +41,12 @@ function initApp() {
     DOM.blogTitle = document.getElementById('blogTitle');
     DOM.blogDesc = document.getElementById('blogDesc');
 
-    // 检测是否在 iframe 中
     APP_STATE.isInIframe = window.parent !== window;
 
-    // 解析当前 URL 参数
     const urlParams = new URLSearchParams(window.location.search);
     const pageParam = urlParams.get('page');
 
     if (pageParam) {
-        // 判断是 page 还是 docs
         if (pageParam.startsWith('docs/')) {
             APP_STATE.currentPageId = pageParam;
             APP_STATE.currentRouteType = 'docs';
@@ -63,136 +59,136 @@ function initApp() {
         APP_STATE.currentRouteType = 'home';
     }
 
-    // 加载数据
     loadPostsData()
         .then(() => {
-            renderSidebar();
+            renderSidebar();        // 初始侧边栏（首页或文章页）
             renderContent();
             bindEvents();
             setupBackToTop();
 
-            // 通知父页面（404.html）已准备就绪
             if (APP_STATE.isInIframe) {
                 sendToParent({ type: 'ready' });
-                sendToParent({
-                    type: 'setTitle',
-                    title: getPageTitle(),
-                });
+                sendToParent({ type: 'setTitle', title: getPageTitle() });
             }
-
-            // 设置文档标题
             document.title = getPageTitle();
-
-            console.log('[博客应用] 初始化完成');
-            console.log('  当前路由类型:', APP_STATE.currentRouteType);
-            console.log('  当前文章ID:', APP_STATE.currentPageId || '(首页)');
-            console.log('  是否在iframe中:', APP_STATE.isInIframe);
         })
         .catch((err) => {
             console.error('[博客应用] 加载失败:', err);
             DOM.contentContainer.innerHTML = `
-                        <div class="not-found-inner">
-                            <div class="icon">⚠️</div>
-                            <h3>数据加载失败</h3>
-                            <p>无法加载文章数据，请检查 posts.json 文件是否存在。</p>
-                            <p style="font-size:0.8rem;color:#94a3b8;margin-top:0.5rem;">${err.message}</p>
-                        </div>
-                    `;
+                <div class="not-found-inner">
+                    <div class="icon">⚠️</div>
+                    <h3>数据加载失败</h3>
+                    <p>无法加载文章数据，请检查 posts.json 文件是否存在。</p>
+                    <p style="font-size:0.8rem;color:#94a3b8;">${err.message}</p>
+                </div>
+            `;
         });
 }
 
 // ==================== 加载 posts.json ====================
 async function loadPostsData() {
     const response = await fetch('../posts/posts.json');
-    if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
     APP_STATE.postsData = await response.json();
-
-    // 验证数据结构
     if (!APP_STATE.postsData.posts || !Array.isArray(APP_STATE.postsData.posts)) {
         throw new Error('posts.json 格式错误：缺少 posts 数组');
     }
-
-    // 为每篇文章添加唯一标识（如果使用 id 字段）
     APP_STATE.postsData.posts.forEach((post, index) => {
-        if (!post.id) {
-            console.warn(`文章 #${index} 缺少 id 字段，使用索引作为 id`);
-            post.id = `post-${index}`;
-        }
-        if (!post.type) {
-            post.type = 'page'; // 默认为 page 类型
-        }
+        if (!post.id) post.id = `post-${index}`;
+        if (!post.type) post.type = 'page';
     });
-
-    return APP_STATE.postsData;
 }
 
-// ==================== 获取页面标题 ====================
+// ==================== 标题获取 ====================
 function getPageTitle() {
     const blogTitle = APP_STATE.postsData?.title || '博客';
-
-    if (APP_STATE.currentRouteType === 'home') {
-        return blogTitle;
-    }
-
+    if (APP_STATE.currentRouteType === 'home') return blogTitle;
     const post = findCurrentPost();
-    if (post) {
-        return `${post.title} - ${blogTitle}`;
-    }
-
-    return blogTitle;
+    return post ? `${post.title} - ${blogTitle}` : blogTitle;
 }
 
-// ==================== 查找当前文章 ====================
 function findCurrentPost() {
     if (!APP_STATE.postsData || !APP_STATE.currentPageId) return null;
     return APP_STATE.postsData.posts.find(
-        (p) => p.id === APP_STATE.currentPageId && p.type === APP_STATE.currentRouteType
+        p => p.id === APP_STATE.currentPageId && p.type === APP_STATE.currentRouteType
     );
 }
 
-// ==================== 渲染侧边栏 ====================
-function renderSidebar() {
+// ==================== 侧边栏渲染（核心） ====================
+function renderSidebar(forArticle = false) {
     if (!APP_STATE.postsData) return;
 
-    // 设置博客标题和描述
-    if (APP_STATE.postsData.title) {
-        DOM.blogTitle.textContent = '📝 ' + APP_STATE.postsData.title;
-    }
-    if (APP_STATE.postsData.description) {
-        DOM.blogDesc.textContent = APP_STATE.postsData.description;
-    }
+    // 博客基本信息保持不变
+    if (APP_STATE.postsData.title) DOM.blogTitle.textContent = '📝 ' + APP_STATE.postsData.title;
+    if (APP_STATE.postsData.description) DOM.blogDesc.textContent = APP_STATE.postsData.description;
 
-    // 分类文章
-    const pagePosts = APP_STATE.postsData.posts.filter((p) => p.type === 'page');
-    const docsPosts = APP_STATE.postsData.posts.filter((p) => p.type === 'docs');
+    // 清空导航列表
+    DOM.navList.innerHTML = '';
 
-    // 渲染 page 类型文章
-    DOM.pageNavItems.innerHTML = '';
-    if (pagePosts.length > 0) {
-        document.getElementById('pageSection').style.display = '';
-        pagePosts.forEach((post) => {
-            const link = createNavItem(post, 'page');
-            DOM.pageNavItems.appendChild(link);
-        });
+    if (forArticle) {
+        // 文章页：只显示首页链接 + TOC 占位区
+        const homeSection = document.createElement('div');
+        homeSection.className = 'nav-section';
+        homeSection.innerHTML = `<div class="nav-section-title">🏠 导航</div>`;
+        const homeLink = document.createElement('a');
+        homeLink.className = 'nav-item home-link';
+        homeLink.dataset.path = '/home';
+        homeLink.dataset.type = 'home';
+        homeLink.href = '/home';
+        homeLink.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nav-icon">
+            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg> 返回首页`;
+        homeSection.appendChild(homeLink);
+
+        const tocSection = document.createElement('div');
+        tocSection.className = 'nav-section';
+        tocSection.innerHTML = `<div class="nav-section-title">📑 目录</div>`;
+        const tocContainer = document.createElement('div');
+        tocContainer.id = 'tocContainer';
+        tocContainer.className = 'toc-list';
+        tocSection.appendChild(tocContainer);
+
+        DOM.navList.appendChild(homeSection);
+        DOM.navList.appendChild(tocSection);
     } else {
-        document.getElementById('pageSection').style.display = 'none';
+        // 首页：保留原文章分类列表
+        const pagePosts = APP_STATE.postsData.posts.filter(p => p.type === 'page');
+        const docsPosts = APP_STATE.postsData.posts.filter(p => p.type === 'docs');
+
+        const homeSection = document.createElement('div');
+        homeSection.className = 'nav-section';
+        homeSection.innerHTML = `<div class="nav-section-title">🏠 导航</div>`;
+        const homeLink = document.createElement('a');
+        homeLink.className = 'nav-item home-link';
+        homeLink.dataset.path = '/home';
+        homeLink.dataset.type = 'home';
+        homeLink.href = '/home';
+        homeLink.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nav-icon">
+            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg> 首页`;
+        homeSection.appendChild(homeLink);
+        DOM.navList.appendChild(homeSection);
+
+        if (pagePosts.length > 0) {
+            const section = document.createElement('div');
+            section.className = 'nav-section';
+            section.innerHTML = `<div class="nav-section-title">📄 文章</div>`;
+            pagePosts.forEach(post => section.appendChild(createNavItem(post, 'page')));
+            DOM.navList.appendChild(section);
+        }
+
+        if (docsPosts.length > 0) {
+            const section = document.createElement('div');
+            section.className = 'nav-section';
+            section.innerHTML = `<div class="nav-section-title">📚 文档</div>`;
+            docsPosts.forEach(post => section.appendChild(createNavItem(post, 'docs')));
+            DOM.navList.appendChild(section);
+        }
     }
 
-    // 渲染 docs 类型文章
-    DOM.docsNavItems.innerHTML = '';
-    if (docsPosts.length > 0) {
-        document.getElementById('docsSection').style.display = '';
-        docsPosts.forEach((post) => {
-            const link = createNavItem(post, 'docs');
-            DOM.docsNavItems.appendChild(link);
-        });
-    } else {
-        document.getElementById('docsSection').style.display = 'none';
-    }
-
-    // 高亮当前导航项
+    // 高亮当前页（仅首页有效）
     highlightCurrentNav();
 }
 
@@ -205,43 +201,24 @@ function createNavItem(post, type) {
     link.href = link.dataset.path;
     link.title = post.title;
     link.textContent = post.title;
-
-    // 如果有标签，添加小徽章
     if (post.tags && post.tags.length > 0) {
         const badge = document.createElement('span');
         badge.className = 'nav-badge';
         badge.textContent = post.tags[0];
         link.appendChild(badge);
     }
-
     return link;
 }
 
 function highlightCurrentNav() {
-    // 移除所有活跃状态
-    document.querySelectorAll('.nav-item').forEach((item) => {
-        item.classList.remove('active');
-    });
-
-    // 高亮首页
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
     if (APP_STATE.currentRouteType === 'home') {
         const homeLink = document.querySelector('.home-link');
         if (homeLink) homeLink.classList.add('active');
-        return;
-    }
-
-    // 高亮对应文章
-    const activeItem = document.querySelector(
-        `.nav-item[data-post-id="${CSS.escape(APP_STATE.currentPageId || '')}"]`
-    );
-    if (activeItem) {
-        activeItem.classList.add('active');
-        // 滚动到可见位置
-        activeItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
 }
 
-// ==================== 渲染内容区 ====================
+// ==================== 内容渲染 ====================
 function renderContent() {
     if (APP_STATE.currentRouteType === 'home') {
         renderHomePage();
@@ -249,76 +226,54 @@ function renderContent() {
         const post = findCurrentPost();
         if (post) {
             renderArticle(post);
+            // 渲染完文章后构建 TOC
+            buildTableOfContents();
         } else {
             renderNotFound();
         }
     }
 
-    // 更新移动端标题
     if (DOM.mobileTitle) {
-        if (APP_STATE.currentRouteType === 'home') {
-            DOM.mobileTitle.textContent = APP_STATE.postsData?.title || '博客';
-        } else {
-            const post = findCurrentPost();
-            DOM.mobileTitle.textContent = post ? post.title : '未找到';
-        }
+        DOM.mobileTitle.textContent = 
+            APP_STATE.currentRouteType === 'home' ? 
+            (APP_STATE.postsData?.title || '博客') : 
+            (findCurrentPost()?.title || '未找到');
     }
 }
 
 function renderHomePage() {
+    // 保持不变，省略...（与之前相同）
     if (!APP_STATE.postsData) return;
-
-    const pagePosts = APP_STATE.postsData.posts.filter((p) => p.type === 'page');
-    const docsPosts = APP_STATE.postsData.posts.filter((p) => p.type === 'docs');
+    const pagePosts = APP_STATE.postsData.posts.filter(p => p.type === 'page');
+    const docsPosts = APP_STATE.postsData.posts.filter(p => p.type === 'docs');
 
     let html = `
-                <div class="home-welcome">
-                    <span class="welcome-emoji">👋</span>
-                    <h2>${APP_STATE.postsData.title || '欢迎来到我的博客'}</h2>
-                    <p style="color:#64748b;margin-top:0.3rem;">${APP_STATE.postsData.description || '记录学习与思考'}</p>
-                </div>
-            `;
+        <div class="home-welcome">
+            <span class="welcome-emoji">👋</span>
+            <h2>${APP_STATE.postsData.title || '欢迎'}</h2>
+            <p style="color:#64748b;">${APP_STATE.postsData.description || ''}</p>
+        </div>`;
 
-    if (pagePosts.length > 0) {
-        html += `<div class="section-label">📄 最新文章</div>`;
-        html += `<div class="post-list">`;
-        pagePosts
-            .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
-            .forEach((post) => {
-                html += createPostListItem(post, 'page');
-            });
+    if (pagePosts.length) {
+        html += `<div class="section-label">📄 最新文章</div><div class="post-list">`;
+        pagePosts.sort((a,b) => new Date(b.date||0) - new Date(a.date||0))
+                 .forEach(post => html += createPostListItem(post, 'page'));
         html += `</div>`;
     }
-
-    if (docsPosts.length > 0) {
-        html += `<div class="section-label">📚 文档</div>`;
-        html += `<div class="post-list">`;
-        docsPosts
-            .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
-            .forEach((post) => {
-                html += createPostListItem(post, 'docs');
-            });
+    if (docsPosts.length) {
+        html += `<div class="section-label">📚 文档</div><div class="post-list">`;
+        docsPosts.sort((a,b) => new Date(b.date||0) - new Date(a.date||0))
+                 .forEach(post => html += createPostListItem(post, 'docs'));
         html += `</div>`;
     }
-
-    if (pagePosts.length === 0 && docsPosts.length === 0) {
-        html += `
-                    <div style="text-align:center;padding:2rem;color:#94a3b8;">
-                        <p>还没有文章，快去创建第一篇吧！</p>
-                    </div>
-                `;
+    if (!pagePosts.length && !docsPosts.length) {
+        html += `<div style="text-align:center;padding:2rem;color:#94a3b8;"><p>还没有文章</p></div>`;
     }
-
     DOM.contentContainer.innerHTML = html;
-
-    // 绑定首页文章列表的点击事件
-    DOM.contentContainer.querySelectorAll('.post-list-item').forEach((item) => {
+    DOM.contentContainer.querySelectorAll('.post-list-item').forEach(item => {
         item.addEventListener('click', function(e) {
             e.preventDefault();
-            const path = this.dataset.path;
-            const postId = this.dataset.postId;
-            const type = this.dataset.type;
-            navigateTo(path, postId, type);
+            navigateTo(this.dataset.path, this.dataset.postId, this.dataset.type);
         });
     });
 }
@@ -326,36 +281,31 @@ function renderHomePage() {
 function createPostListItem(post, type) {
     const path = type === 'page' ? `/page/${post.id}` : `/docs/${post.id.replace('docs/', '')}`;
     const dateStr = post.date ? formatDate(post.date) : '';
-    const tagStr = post.tags && post.tags.length > 0 ? post.tags[0] : '';
-
-    return `
-                <a class="post-list-item" data-path="${path}" data-post-id="${post.id}" data-type="${type}" href="${path}">
-                    <span class="post-title">${escapeHtml(post.title)}</span>
-                    ${tagStr ? `<span class="post-tag">${escapeHtml(tagStr)}</span>` : ''}
-                    ${dateStr ? `<span class="post-date">${dateStr}</span>` : ''}
-                </a>
-            `;
+    const tagStr = post.tags?.[0] || '';
+    return `<a class="post-list-item" data-path="${path}" data-post-id="${post.id}" data-type="${type}" href="${path}">
+        <span class="post-title">${escapeHtml(post.title)}</span>
+        ${tagStr ? `<span class="post-tag">${escapeHtml(tagStr)}</span>` : ''}
+        ${dateStr ? `<span class="post-date">${dateStr}</span>` : ''}
+    </a>`;
 }
 
 function renderArticle(post) {
     let html = `
-                <div class="article-header">
-                    <h1 class="article-title">${escapeHtml(post.title)}</h1>
-                    <div class="article-meta">
-                        ${post.date ? `<span>📅 ${formatDate(post.date)}</span>` : ''}
-                        ${post.author ? `<span>✍️ ${escapeHtml(post.author)}</span>` : ''}
-                        ${post.tags ? post.tags.map(t => `<span class="article-tag">${escapeHtml(t)}</span>`).join('') : ''}
-                    </div>
-                </div>
-                <div class="article-body">
-                    ${renderMarkdown(post.content || '')}
-                </div>
-            `;
-
+        <div class="article-header">
+            <h1 class="article-title">${escapeHtml(post.title)}</h1>
+            <div class="article-meta">
+                ${post.date ? `<span>📅 ${formatDate(post.date)}</span>` : ''}
+                ${post.author ? `<span>✍️ ${escapeHtml(post.author)}</span>` : ''}
+                ${post.tags ? post.tags.map(t => `<span class="article-tag">${escapeHtml(t)}</span>`).join('') : ''}
+            </div>
+        </div>
+        <div class="article-body">
+            ${renderMarkdown(post.content || '')}
+        </div>`;
     DOM.contentContainer.innerHTML = html;
 
-    // 为文章内的链接添加处理（外部链接新窗口打开）
-    DOM.contentContainer.querySelectorAll('.article-body a').forEach((link) => {
+    // 外部链接新窗口打开
+    DOM.contentContainer.querySelectorAll('.article-body a').forEach(link => {
         const href = link.getAttribute('href');
         if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
             link.setAttribute('target', '_blank');
@@ -366,188 +316,179 @@ function renderArticle(post) {
 
 function renderNotFound() {
     DOM.contentContainer.innerHTML = `
-                <div class="not-found-inner">
-                    <div class="icon">📭</div>
-                    <h3>文章未找到</h3>
-                    <p>抱歉，您查找的文章「<strong>${escapeHtml(APP_STATE.currentPageId || '')}</strong>」不存在。</p>
-                    <p style="margin-top:1rem;">
-                        <a href="/home" class="btn-home-inline" data-path="/home" data-type="home">← 返回首页</a>
-                    </p>
-                </div>
-            `;
-
-    // 绑定返回首页按钮
-    const homeBtn = DOM.contentContainer.querySelector('.btn-home-inline');
-    if (homeBtn) {
-        homeBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            navigateTo('/home', null, 'home');
-        });
-    }
+        <div class="not-found-inner">
+            <div class="icon">📭</div>
+            <h3>文章未找到</h3>
+            <p>「${escapeHtml(APP_STATE.currentPageId || '')}」不存在。</p>
+            <p><a href="/home" class="btn-home-inline" data-path="/home">← 返回首页</a></p>
+        </div>`;
+    DOM.contentContainer.querySelector('.btn-home-inline').addEventListener('click', e => {
+        e.preventDefault();
+        navigateTo('/home', null, 'home');
+    });
 }
 
-// ==================== Markdown 渲染 ====================
-function renderMarkdown(markdown) {
-    if (!markdown || typeof markdown !== 'string') return '<p>（无内容）</p>';
-    try {
-        if (typeof marked !== 'undefined') {
-            // 配置 marked
-            if (typeof marked.setOptions === 'function') {
-                marked.setOptions({
-                    breaks: true,
-                    gfm: true,
-                });
-            }
-            return marked.parse(markdown);
-        } else {
-            // 如果没有 marked，返回转义后的纯文本
-            return '<pre>' + escapeHtml(markdown) + '</pre>';
+// ==================== TOC (目录) 构建与监听 ====================
+function buildTableOfContents() {
+    const tocContainer = document.getElementById('tocContainer');
+    if (!tocContainer) return;
+
+    // 获取文章内所有 h2, h3
+    const headings = DOM.contentContainer.querySelectorAll('.article-body h2, .article-body h3');
+    if (headings.length === 0) {
+        tocContainer.innerHTML = '<div style="padding:0.5rem 1.25rem;color:#64748b;font-size:0.85rem;">暂无标题</div>';
+        return;
+    }
+
+    // 确保每个标题有 id（marked 默认会生成，但可加强）
+    headings.forEach((heading, idx) => {
+        if (!heading.id) {
+            heading.id = 'toc-' + idx;
         }
-    } catch (err) {
-        console.error('Markdown 渲染失败:', err);
-        return '<pre>' + escapeHtml(markdown) + '</pre>';
-    }
+    });
+
+    // 生成 TOC HTML
+    let tocHTML = '';
+    headings.forEach((heading) => {
+        const level = heading.tagName.toLowerCase(); // h2 或 h3
+        const text = heading.textContent;
+        const id = heading.id;
+        tocHTML += `<a class="toc-item toc-${level}" href="#${id}" data-target="${id}">${escapeHtml(text)}</a>`;
+    });
+    tocContainer.innerHTML = tocHTML;
+
+    // 绑定点击事件（平滑滚动）
+    tocContainer.querySelectorAll('.toc-item').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.dataset.target;
+            const targetEl = document.getElementById(targetId);
+            if (targetEl) {
+                targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // 移动端关闭侧边栏
+                closeSidebar();
+            }
+        });
+    });
+
+    // 启动 IntersectionObserver 监听标题
+    observeHeadings(headings);
 }
 
-// ==================== 导航处理 ====================
+function observeHeadings(headings) {
+    // 清除旧的 observer
+    if (APP_STATE.tocObserver) {
+        APP_STATE.tocObserver.disconnect();
+    }
+
+    const tocItems = document.querySelectorAll('.toc-item');
+    if (tocItems.length === 0) return;
+
+    const options = {
+        root: DOM.mainContent,        // 监视主内容区滚动
+        rootMargin: '-80px 0px -60% 0px', // 顶部留80px，底部只保留40%区域判定
+        threshold: 0
+    };
+
+    APP_STATE.tocObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            const id = entry.target.id;
+            const tocItem = document.querySelector(`.toc-item[data-target="${id}"]`);
+            if (entry.isIntersecting) {
+                // 移除所有高亮
+                tocItems.forEach(item => item.classList.remove('active'));
+                if (tocItem) {
+                    tocItem.classList.add('active');
+                    // 滚动侧边栏使可见
+                    tocItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                }
+            }
+        });
+    }, options);
+
+    headings.forEach(heading => APP_STATE.tocObserver.observe(heading));
+}
+
+// ==================== 导航跳转 ====================
 function navigateTo(path, postId, routeType) {
-    // 更新状态
     APP_STATE.currentPageId = postId;
     APP_STATE.currentRouteType = routeType;
 
-    // 重新渲染
+    // 重新构建侧边栏（文章页显示 TOC，首页显示列表）
+    const isArticle = (routeType === 'page' || routeType === 'docs');
+    renderSidebar(isArticle);
     renderContent();
-    highlightCurrentNav();
 
-    // 滚动到顶部
     DOM.mainContent.scrollTop = 0;
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // 如果在 iframe 中，通知父页面更新 URL
     if (APP_STATE.isInIframe) {
-        sendToParent({
-            type: 'navigate',
-            path: path,
-        });
+        sendToParent({ type: 'navigate', path: path });
+        sendToParent({ type: 'setTitle', title: getPageTitle() });
     }
-
-    // 更新标题
     document.title = getPageTitle();
-    if (APP_STATE.isInIframe) {
-        sendToParent({
-            type: 'setTitle',
-            title: getPageTitle(),
-        });
-    }
 
-    // 移动端关闭侧栏
     closeSidebar();
-
-    // 搜索框清空
-    if (DOM.searchInput) {
-        DOM.searchInput.value = '';
-        resetSearchFilter();
-    }
+    if (DOM.searchInput) DOM.searchInput.value = '';
 }
 
 // ==================== 事件绑定 ====================
 function bindEvents() {
-    // 侧栏导航链接点击
     DOM.navList.addEventListener('click', function(e) {
         const navItem = e.target.closest('.nav-item');
         if (!navItem) return;
-
         e.preventDefault();
-
         const path = navItem.dataset.path;
         const postId = navItem.dataset.postId || null;
         const type = navItem.dataset.type || 'home';
-
         navigateTo(path, postId, type);
     });
 
-    // 移动端汉堡菜单
-    if (DOM.hamburgerBtn) {
-        DOM.hamburgerBtn.addEventListener('click', toggleSidebar);
-    }
+    if (DOM.hamburgerBtn) DOM.hamburgerBtn.addEventListener('click', toggleSidebar);
+    if (DOM.sidebarOverlay) DOM.sidebarOverlay.addEventListener('click', closeSidebar);
 
-    // 遮罩层点击关闭侧栏
-    if (DOM.sidebarOverlay) {
-        DOM.sidebarOverlay.addEventListener('click', closeSidebar);
-    }
-
-    // 搜索框输入
     if (DOM.searchInput) {
         DOM.searchInput.addEventListener('input', debounce(handleSearch, 250));
     }
 
-    // 键盘快捷键
     document.addEventListener('keydown', function(e) {
-        // ESC 关闭侧栏
-        if (e.key === 'Escape') {
-            closeSidebar();
-        }
-        // Ctrl/Cmd + K 聚焦搜索
+        if (e.key === 'Escape') closeSidebar();
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
             e.preventDefault();
             if (DOM.searchInput) DOM.searchInput.focus();
         }
     });
 
-    // 监听来自父页面（404.html）的消息（处理浏览器前进/后退）
     window.addEventListener('message', function(event) {
         if (event.origin !== window.location.origin) return;
-
         const data = event.data;
-        if (!data || typeof data !== 'object') return;
-
-        if (data.type === 'popstate') {
-            // 父页面通知路由变化
+        if (data?.type === 'popstate') {
             APP_STATE.currentPageId = data.pageParam;
             APP_STATE.currentRouteType = data.routeType || 'home';
-
-            if (data.routeType === 'home') {
-                APP_STATE.currentPageId = null;
-                APP_STATE.currentRouteType = 'home';
-            }
-
+            const isArticle = (data.routeType === 'page' || data.routeType === 'docs');
+            renderSidebar(isArticle);
             renderContent();
-            highlightCurrentNav();
             document.title = getPageTitle();
-
-            // 滚动到顶部
             DOM.mainContent.scrollTop = 0;
-
-            // 关闭移动端侧栏
             closeSidebar();
         }
     });
 
-    // 窗口大小变化时，大屏自动关闭遮罩
-    window.addEventListener('resize', function() {
-        if (window.innerWidth > 768) {
-            closeSidebar();
-        }
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) closeSidebar();
     });
 }
 
-// ==================== 侧栏切换（移动端） ====================
+// 侧边栏切换
 function toggleSidebar() {
-    const isOpen = DOM.sidebar.classList.contains('open');
-    if (isOpen) {
-        closeSidebar();
-    } else {
-        openSidebar();
-    }
+    DOM.sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
 }
-
 function openSidebar() {
     DOM.sidebar.classList.add('open');
     DOM.sidebarOverlay.classList.add('active');
     DOM.hamburgerBtn?.classList.add('active');
     document.body.style.overflow = 'hidden';
 }
-
 function closeSidebar() {
     DOM.sidebar.classList.remove('open');
     DOM.sidebarOverlay.classList.remove('active');
@@ -555,131 +496,57 @@ function closeSidebar() {
     document.body.style.overflow = '';
 }
 
-// ==================== 搜索功能 ====================
+// 搜索
 function handleSearch() {
     const query = DOM.searchInput.value.trim().toLowerCase();
-
+    const allNavItems = DOM.navList.querySelectorAll('.nav-item:not(.home-link):not(.toc-item)');
     if (!query) {
-        resetSearchFilter();
+        allNavItems.forEach(item => item.style.display = '');
         return;
     }
-
-    // 过滤侧栏导航项
-    const allNavItems = DOM.navList.querySelectorAll('.nav-item:not(.home-link)');
-    allNavItems.forEach((item) => {
+    allNavItems.forEach(item => {
         const title = (item.textContent || '').toLowerCase();
-        const postId = (item.dataset.postId || '').toLowerCase();
-        if (title.includes(query) || postId.includes(query)) {
-            item.style.display = '';
-        } else {
-            item.style.display = 'none';
-        }
+        item.style.display = title.includes(query) ? '' : 'none';
     });
-
-    // 高亮匹配的 section 标题
-    updateSectionVisibility();
 }
 
-function resetSearchFilter() {
-    const allNavItems = DOM.navList.querySelectorAll('.nav-item');
-    allNavItems.forEach((item) => {
-        item.style.display = '';
-    });
-    updateSectionVisibility();
-}
-
-function updateSectionVisibility() {
-    const pageSection = document.getElementById('pageSection');
-    const docsSection = document.getElementById('docsSection');
-
-    if (pageSection) {
-        const visibleItems = pageSection.querySelectorAll('.nav-item[style*="display:"]');
-        const allHidden = pageSection.querySelectorAll('.nav-item').length === visibleItems.length &&
-            visibleItems.length > 0;
-        // 检查是否全部隐藏
-        const totalItems = pageSection.querySelectorAll('.nav-item').length;
-        const hiddenCount = pageSection.querySelectorAll('.nav-item[style="display: none;"]').length;
-        pageSection.style.display = hiddenCount >= totalItems ? 'none' : '';
-    }
-
-    if (docsSection) {
-        const totalItems = docsSection.querySelectorAll('.nav-item').length;
-        const hiddenCount = docsSection.querySelectorAll('.nav-item[style="display: none;"]').length;
-        docsSection.style.display = hiddenCount >= totalItems ? 'none' : '';
-    }
-}
-
-// ==================== 回到顶部按钮 ====================
+// 回到顶部
 function setupBackToTop() {
-    if (!DOM.backToTop) return;
-
-    // 监听主内容区滚动
-    DOM.mainContent.addEventListener('scroll', function() {
-        if (DOM.mainContent.scrollTop > 400) {
-            DOM.backToTop.classList.add('visible');
-        } else {
-            DOM.backToTop.classList.remove('visible');
-        }
+    DOM.mainContent.addEventListener('scroll', () => {
+        DOM.backToTop.classList.toggle('visible', DOM.mainContent.scrollTop > 400);
     });
-
-    // 也监听窗口滚动
-    window.addEventListener('scroll', function() {
-        if (window.scrollY > 400) {
-            DOM.backToTop.classList.add('visible');
-        } else {
-            DOM.backToTop.classList.remove('visible');
-        }
-    });
-
-    DOM.backToTop.addEventListener('click', function() {
+    DOM.backToTop.addEventListener('click', () => {
         DOM.mainContent.scrollTo({ top: 0, behavior: 'smooth' });
-        window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 }
 
 // ==================== 工具函数 ====================
-function sendToParent(message) {
-    if (window.parent && window.parent !== window) {
-        window.parent.postMessage(message, window.location.origin);
-    }
+function sendToParent(msg) {
+    if (window.parent !== window) window.parent.postMessage(msg, window.location.origin);
 }
-
 function formatDate(dateStr) {
-    if (!dateStr) return '';
-    try {
-        const date = new Date(dateStr);
-        if (isNaN(date.getTime())) return dateStr;
-        return date.toLocaleDateString('zh-CN', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-        });
-    } catch {
-        return dateStr;
-    }
+    try { return new Date(dateStr).toLocaleDateString('zh-CN', { year:'numeric', month:'long', day:'numeric' }); }
+    catch { return dateStr; }
 }
-
 function escapeHtml(str) {
-    if (!str) return '';
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
 }
-
 function debounce(fn, delay) {
     let timer;
-    return function(...args) {
-        clearTimeout(timer);
-        timer = setTimeout(() => fn.apply(this, args), delay);
-    };
+    return function(...args) { clearTimeout(timer); timer = setTimeout(() => fn.apply(this, args), delay); };
+}
+function renderMarkdown(md) {
+    if (!md) return '<p>（无内容）</p>';
+    try {
+        if (typeof marked !== 'undefined') {
+            marked.setOptions?.({ breaks: true, gfm: true, headerIds: true });
+            return marked.parse(md);
+        }
+        return '<pre>' + escapeHtml(md) + '</pre>';
+    } catch { return '<pre>' + escapeHtml(md) + '</pre>'; }
 }
 
-// CSS.escape 的 polyfill（用于安全的选择器）
-if (!CSS.escape) {
-    CSS.escape = function(value) {
-        return String(value).replace(/([^\w-])/g, '\\$1');
-    };
-}
-
-// ==================== 启动应用 ====================
+// 启动
 document.addEventListener('DOMContentLoaded', initApp);
