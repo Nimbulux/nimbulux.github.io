@@ -1,18 +1,486 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-    <head>
-        <meta charset="UTF-8">
-        <title>晕染之云</title>
-        <script src="404.js"></script>
-    </head>
-    <body>
-        <noscript>
-            <h1>晕染之云</h1>
-            <p>你目前处于404页面</p>
-            <p>因为禁用的或者不支持的 JavaScript</p>
-            <p>网页目前不知您的状态</p>
-            <p>请开启或更换更新的浏览器</p>
-        </noscript>
-        <main id="main-page"></main>
-    </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博客 - 路由导航</title>
+    <style>
+        :root {
+            --bg: #f8f9fa;
+            --text: #333;
+            --card-bg: #fff;
+            --border: #e0e0e0;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --code-bg: #f1f5f9;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --radius: 8px;
+            --transition: 0.2s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ========== 404 错误页面样式 ========== */
+        .error-404-container {
+            display: none;
+            flex: 1;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .error-404-container.active {
+            display: flex;
+        }
+
+        .error-404-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 3rem 2.5rem;
+            text-align: center;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+            max-width: 480px;
+            width: 100%;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .error-404-icon {
+            font-size: 5rem;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-16px);
+            }
+        }
+
+        .error-404-code {
+            font-size: 4rem;
+            font-weight: 800;
+            color: #e5e7eb;
+            letter-spacing: -2px;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .error-404-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.75rem;
+        }
+
+        .error-404-desc {
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .error-404-path {
+            display: inline-block;
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.85rem;
+            margin: 0.5rem 0;
+            word-break: break-all;
+        }
+
+        .btn-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 0.7rem 1.6rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all var(--transition);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+        }
+
+        .btn-home:hover {
+            background: var(--accent-hover);
+            box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .btn-home svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* ========== iframe 容器 ========== */
+        .app-frame-container {
+            display: none;
+            flex: 1;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .app-frame-container.active {
+            display: block;
+        }
+
+        .app-frame-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* ========== 加载动画 ========== */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e5e7eb;
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 加载动画 -->
+    <div class="loading-overlay active" id="loadingOverlay">
+        <div class="spinner"></div>
+        <span class="loading-text">正在加载...</span>
+    </div>
+
+    <!-- 404 错误页面 -->
+    <div class="error-404-container" id="error404Container">
+        <div class="error-404-card">
+            <div class="error-404-icon">🔍</div>
+            <div class="error-404-code">404</div>
+            <div class="error-404-title">页面未找到</div>
+            <div class="error-404-desc">
+                您访问的路径不存在，无法处理该请求。
+            </div>
+            <div class="error-404-path" id="errorPathDisplay"></div>
+            <div style="margin-top: 1.5rem;">
+                <a class="btn-home" href="/home" onclick="return navigateHome(event)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                    返回首页
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 应用 iframe 容器 -->
+    <div class="app-frame-container" id="appFrameContainer">
+        <iframe id="appFrame" title="博客应用" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-top-navigation"></iframe>
+    </div>
+
+    <script>
+        (function() {
+            // ==================== 配置 ====================
+            // 如果部署在 username.github.io/repo-name/ 下，请设置 basePath
+            // 例如：仓库名为 my-blog，则设置 basePath = '/my-blog'
+            // 如果使用自定义域名或 username.github.io，保持空字符串
+            const BASE_PATH = '';
+
+            // ==================== DOM 元素 ====================
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const error404Container = document.getElementById('error404Container');
+            const errorPathDisplay = document.getElementById('errorPathDisplay');
+            const appFrameContainer = document.getElementById('appFrameContainer');
+            const appFrame = document.getElementById('appFrame');
+
+            // ==================== 工具函数 ====================
+            function getCurrentPath() {
+                let path = window.location.pathname;
+                // 移除 basePath 前缀
+                if (BASE_PATH && path.startsWith(BASE_PATH)) {
+                    path = path.substring(BASE_PATH.length);
+                }
+                // 确保以 / 开头
+                if (!path.startsWith('/')) path = '/' + path;
+                // 移除末尾斜杠（但保留根路径）
+                if (path.length > 1 && path.endsWith('/')) {
+                    path = path.slice(0, -1);
+                }
+                return path;
+            }
+
+            function getTier() {
+                const params = new URLSearchParams(window.location.search);
+                return params.get('tier') || 'basic';
+            }
+
+            /**
+             * 解析路径，返回 { type: 'home' | 'page' | 'docs' | '404', pageParam: string | null }
+             */
+            function parsePath(path) {
+                // 首页路径
+                if (path === '/' || path === '/home' || path === '/index') {
+                    return { type: 'home', pageParam: null };
+                }
+
+                // /page/xxx
+                const pageMatch = path.match(/^\/page\/(.+)$/);
+                if (pageMatch) {
+                    return { type: 'page', pageParam: pageMatch[1] };
+                }
+
+                // /docs/xxx
+                const docsMatch = path.match(/^\/docs\/(.+)$/);
+                if (docsMatch) {
+                    return { type: 'docs', pageParam: 'docs/' + docsMatch[1] };
+                }
+
+                // 无法识别的路径
+                return { type: '404', pageParam: null };
+            }
+
+            /**
+             * 构建应用 iframe 的 src
+             */
+            function buildAppSrc(tier, parsed) {
+                const baseUrl = BASE_PATH + '/app/' + tier + '/index.html';
+                if (parsed.type === 'home') {
+                    return baseUrl;
+                }
+                if (parsed.type === 'page' || parsed.type === 'docs') {
+                    return baseUrl + '?page=' + encodeURIComponent(parsed.pageParam);
+                }
+                return null;
+            }
+
+            /**
+             * 显示 404 错误页面
+             */
+            function show404(path) {
+                loadingOverlay.classList.remove('active');
+                appFrameContainer.classList.remove('active');
+                error404Container.classList.add('active');
+                errorPathDisplay.textContent = path || getCurrentPath();
+                // 设置页面标题
+                document.title = '404 - 页面未找到';
+            }
+
+            /**
+             * 显示应用 iframe
+             */
+            function showApp(tier, parsed) {
+                const src = buildAppSrc(tier, parsed);
+                if (!src) {
+                    show404(getCurrentPath());
+                    return;
+                }
+
+                error404Container.classList.remove('active');
+                appFrameContainer.classList.add('active');
+                document.title = '博客';
+
+                // 设置 iframe src（如果不同的话）
+                if (appFrame.src !== src || !appFrame.src) {
+                    appFrame.src = src;
+                }
+
+                // iframe 加载完成后隐藏 loading
+                appFrame.onload = function() {
+                    loadingOverlay.classList.remove('active');
+                };
+
+                // 超时处理：3秒后强制隐藏 loading
+                setTimeout(function() {
+                    loadingOverlay.classList.remove('active');
+                }, 3000);
+            }
+
+            /**
+             * 向 iframe 发送导航消息
+             */
+            function sendMessageToFrame(message) {
+                if (appFrame.contentWindow) {
+                    appFrame.contentWindow.postMessage(message, window.location.origin);
+                }
+            }
+
+            // ==================== 初始化 ====================
+            function init() {
+                const path = getCurrentPath();
+                const tier = getTier();
+                const parsed = parsePath(path);
+
+                if (parsed.type === '404') {
+                    show404(path);
+                } else {
+                    showApp(tier, parsed);
+                }
+            }
+
+            // ==================== 消息监听（来自 iframe） ====================
+            window.addEventListener('message', function(event) {
+                // 安全检查：确保消息来自同源
+                if (event.origin !== window.location.origin) return;
+
+                const data = event.data;
+                if (!data || typeof data !== 'object') return;
+
+                if (data.type === 'navigate') {
+                    // iframe 请求导航
+                    const newPath = data.path;
+                    if (!newPath || typeof newPath !== 'string') return;
+
+                    // 构建完整路径（含 basePath）
+                    const fullPath = BASE_PATH + (newPath.startsWith('/') ? newPath : '/' + newPath);
+                    const currentFullPath = window.location.pathname + window.location.search;
+
+                    if (fullPath !== window.location.pathname) {
+                        // 使用 pushState 更新地址栏
+                        window.history.pushState({ path: newPath }, '', fullPath);
+                    }
+                }
+
+                if (data.type === 'ready') {
+                    // iframe 加载完成，隐藏 loading
+                    loadingOverlay.classList.remove('active');
+                }
+
+                if (data.type === 'setTitle' && data.title) {
+                    document.title = data.title;
+                }
+            });
+
+            // ==================== 浏览器前进/后退处理 ====================
+            window.addEventListener('popstate', function(event) {
+                const path = getCurrentPath();
+                const tier = getTier();
+                const parsed = parsePath(path);
+
+                if (parsed.type === '404') {
+                    show404(path);
+                } else {
+                    // 确保应用容器可见
+                    error404Container.classList.remove('active');
+                    appFrameContainer.classList.add('active');
+                    loadingOverlay.classList.add('active');
+
+                    // 通知 iframe 更新内容
+                    const message = {
+                        type: 'popstate',
+                        path: path,
+                        pageParam: parsed.pageParam,
+                        routeType: parsed.type
+                    };
+                    sendMessageToFrame(message);
+
+                    // 也更新 iframe src 作为后备
+                    const src = buildAppSrc(tier, parsed);
+                    if (src && appFrame.src !== src) {
+                        appFrame.src = src;
+                    }
+
+                    // 超时隐藏 loading
+                    setTimeout(function() {
+                        loadingOverlay.classList.remove('active');
+                    }, 2000);
+                }
+            });
+
+            // ==================== 首页导航（从404页面） ====================
+            window.navigateHome = function(event) {
+                if (event) event.preventDefault();
+                const homePath = BASE_PATH + '/home';
+                window.history.pushState({ path: '/home' }, '', homePath);
+                const parsed = parsePath('/home');
+                const tier = getTier();
+                showApp(tier, parsed);
+                return false;
+            };
+
+            // ==================== 启动 ====================
+            // 用 pushState 确保初始历史状态
+            const initialPath = getCurrentPath();
+            if (window.history.state && window.history.state.path) {
+                // 已有状态，不覆盖
+            } else {
+                window.history.replaceState({ path: initialPath }, '', window.location.pathname + window.location
+                    .search);
+            }
+
+            init();
+
+            console.log('[404路由] 初始化完成');
+            console.log('  当前路径:', getCurrentPath());
+            console.log('  Tier:', getTier());
+            console.log('  解析结果:', parsePath(getCurrentPath()));
+            console.log('  BasePath:', BASE_PATH || '(根域名)');
+        })();
+    </script>
+</body>
 </html>

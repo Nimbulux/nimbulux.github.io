@@ -1,0 +1,56 @@
+{
+    "title": "我的技术博客",
+    "description": "记录前端开发、编程技巧与学习心得",
+    "posts": [
+        {
+            "id": "hello-world",
+            "title": "Hello World - 博客开篇",
+            "type": "page",
+            "date": "2024-06-01",
+            "tags": ["随笔", "入门"],
+            "author": "博主",
+            "summary": "这是我的第一篇博客文章，聊聊搭建这个博客的初衷。",
+            "content": "# Hello World\n\n欢迎来到我的博客！🎉\n\n## 关于这个博客\n\n这个博客使用 **GitHub Pages** 托管，采用了一个巧妙的路由方案：\n\n- 所有不存在的路径都由 `404.html` 接管\n- `404.html` 作为路由器，解析 URL 并加载对应的应用页面\n- 侧边栏动态生成文章导航\n- 支持 Markdown 渲染\n\n## 功能特点\n\n1. **干净的路由**：`/home`、`/page/xxx`、`/docs/xxx`\n2. **SPA 体验**：无刷新页面切换\n3. **响应式设计**：适配移动端和桌面端\n4. **搜索功能**：快速筛选文章\n5. **多版本支持**：通过 `?tier=` 参数切换\n\n## 代码示例\n\n```javascript\n// 一个简单的递归函数\nfunction fibonacci(n) {\n    if (n <= 1) return n;\n    return fibonacci(n - 1) + fibonacci(n - 2);\n}\n\nconsole.log(fibonacci(10)); // 55\n```\n\n## 下一步\n\n我会在这里记录更多技术文章，敬请期待！\n\n> \"Stay hungry, stay foolish.\" — Steve Jobs\n"
+        },
+        {
+            "id": "git-workflow",
+            "title": "Git 工作流最佳实践",
+            "type": "page",
+            "date": "2024-06-05",
+            "tags": ["Git", "工具"],
+            "author": "博主",
+            "summary": "介绍日常开发中常用的 Git 工作流程和最佳实践。",
+            "content": "# Git 工作流最佳实践\n\n## 分支策略\n\n推荐使用 **Git Flow** 或 **GitHub Flow**：\n\n- `main` / `master`：稳定版本，可随时部署\n- `develop`：开发分支（Git Flow）\n- `feature/xxx`：功能分支\n- `hotfix/xxx`：紧急修复分支\n\n## 常用命令\n\n```bash\n# 创建并切换到新分支\ngit checkout -b feature/new-feature\n\n# 查看分支状态\ngit log --oneline --graph --all\n\n# 合并分支（保留历史）\ngit merge --no-ff feature/new-feature\n\n# Rebase（保持线性历史）\ngit rebase main\n```\n\n## 提交信息规范\n\n使用约定式提交（Conventional Commits）：\n\n```\nfeat: 添加用户登录功能\nfix: 修复导航栏在移动端的显示问题\ndocs: 更新 README 安装说明\nstyle: 调整代码缩进格式\nrefactor: 重构数据获取逻辑\n```\n\n## 实用技巧\n\n| 场景 | 命令 |\n|------|------|\n| 撤销最近提交 | `git reset --soft HEAD~1` |\n| 暂存改动 | `git stash` |\n| 恢复暂存 | `git stash pop` |\n| 查看远程分支 | `git remote -v` |\n\n> 良好的 Git 习惯能让团队协作事半功倍。\n"
+        },
+        {
+            "id": "css-grid-guide",
+            "title": "CSS Grid 布局完全指南",
+            "type": "page",
+            "date": "2024-06-10",
+            "tags": ["CSS", "前端"],
+            "author": "博主",
+            "summary": "深入理解 CSS Grid 布局，从基础概念到实战应用。",
+            "content": "# CSS Grid 布局完全指南\n\n## 基本概念\n\nCSS Grid 是一个二维布局系统，可以同时控制**行**和**列**。\n\n### 创建网格容器\n\n```css\n.container {\n    display: grid;\n    grid-template-columns: repeat(3, 1fr);\n    grid-template-rows: auto;\n    gap: 16px;\n}\n```\n\n### 放置项目\n\n```css\n.item {\n    grid-column: 1 / 3;  /* 从第1列到第3列 */\n    grid-row: 2;         /* 放在第2行 */\n}\n```\n\n## 常用属性速查\n\n- `grid-template-columns`：定义列\n- `grid-template-rows`：定义行\n- `grid-gap` / `gap`：间距\n- `grid-auto-flow`：自动放置方向\n- `justify-items` / `align-items`：对齐方式\n\n## 实战示例\n\n一个响应式卡片布局：\n\n```css\n.card-grid {\n    display: grid;\n    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));\n    gap: 24px;\n    padding: 16px;\n}\n```\n\n这个布局会自动根据容器宽度调整列数，非常适合博客文章列表！\n"
+        },
+        {
+            "id": "docs/getting-started",
+            "title": "快速入门指南",
+            "type": "docs",
+            "date": "2024-06-02",
+            "tags": ["文档"],
+            "author": "博主",
+            "summary": "如何快速开始使用这个博客系统。",
+            "content": "# 快速入门指南\n\n## 安装部署\n\n1. **Fork 仓库**到你的 GitHub 账号\n2. 在仓库设置中启用 **GitHub Pages**\n3. 选择部署分支（通常是 `main`）\n4. 等待几分钟，访问 `https://你的用户名.github.io/仓库名/`\n\n## 添加文章\n\n编辑 `/app/posts/posts.json`，在 `posts` 数组中添加新条目：\n\n```json\n{\n    \"id\": \"my-new-post\",\n    \"title\": \"我的新文章\",\n    \"type\": \"page\",\n    \"date\": \"2024-07-01\",\n    \"tags\": [\"标签\"],\n    \"content\": \"# 标题\\n\\n文章内容（支持 Markdown）...\"\n}\n```\n\n## 路由说明\n\n| 访问路径 | 对应内容 |\n|----------|----------|\n| `/home` | 首页 |\n| `/page/xxx` | page 类型文章 |\n| `/docs/xxx` | docs 类型文档 |\n\n## 版本切换\n\n在 URL 后添加 `?tier=pro` 参数可以切换到专业版（如果有的话）。\n\n默认使用 `basic` 版本。\n"
+        },
+        {
+            "id": "docs/configuration",
+            "title": "配置参考",
+            "type": "docs",
+            "date": "2024-06-08",
+            "tags": ["文档", "配置"],
+            "author": "博主",
+            "summary": "博客系统的详细配置选项说明。",
+            "content": "# 配置参考\n\n## posts.json 配置\n\n```json\n{\n    \"title\": \"博客标题\",\n    \"description\": \"博客描述\",\n    \"posts\": [\n        {\n            \"id\": \"文章唯一标识\",\n            \"title\": \"文章标题\",\n            \"type\": \"page 或 docs\",\n            \"date\": \"2024-01-01\",\n            \"tags\": [\"标签1\", \"标签2\"],\n            \"author\": \"作者名（可选）\",\n            \"summary\": \"文章摘要（可选）\",\n            \"content\": \"Markdown 格式的文章内容\"\n        }\n    ]\n}\n```\n\n## 404.html 配置\n\n在 `404.html` 顶部可修改 `BASE_PATH`：\n\n```javascript\n// 如果部署在 username.github.io/repo-name/ 下\nconst BASE_PATH = '/repo-name';\n\n// 如果使用自定义域名\nconst BASE_PATH = '';\n```\n\n## 多版本\n\n创建 `/app/pro/` 目录并复制 `basic` 的内容，即可通过 `?tier=pro` 访问。\n\n## 注意事项\n\n- 所有文章 ID 必须唯一\n- `type: \"docs\"` 的文章 ID 需以 `docs/` 开头\n- Markdown 内容中的代码块会自动高亮显示\n"
+        }
+    ]
+}
