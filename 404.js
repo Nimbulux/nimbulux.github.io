@@ -1,3 +1,3 @@
+document.title = "正在加载";
 
-
-document.body.title = "404未找到";
+document.title = "404未找到"
