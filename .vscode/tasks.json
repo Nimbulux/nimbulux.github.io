@@ -1,0 +1,30 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start Live Server",
+      "type": "shell",
+      "command": "live-server --port=5500 --entry-file=404.html --no-browser",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "custom",
+        "pattern": {
+          "regexp": "Serving \"(.*)\" at (http.*)",
+          "file": 1,
+          "location": 2
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*",
+          "endsPattern": "Serving.*"
+        }
+      }
+    },
+    {
+      "label": "Stop Live Server",
+      "type": "shell",
+      "command": "npx kill-port 5500",
+      "problemMatcher": []
+    }
+  ]
+}
