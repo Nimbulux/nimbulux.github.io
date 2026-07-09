@@ -1,65 +1,17 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Redirecting...</title>
-  <script>
-    // 路由映射表：路径匹配 -> 真实文件，可带查询参数
-    const routes = [
-      {
-        pattern: /^\/home\/?$/,
-        file: '/app/index.html'
-      },
-      {
-        pattern: /^\/page\/([^\/]+)\/?$/,
-        // 捕获组 $1 会替换下面的 {page}
-        file: '/app/page.html',
-        params: (match) => ({ page: match[1] })
-      },
-      {
-        pattern: /^\/docs\/([^\/]+)\/?$/,
-        file: '/app/page.html',
-        params: (match) => ({ page: match[1], docs: 'true' })
-      }
-      // 需要其他路由在这里继续添加
-    ];
-
-    (function() {
-      const path = location.pathname;
-
-      for (const route of routes) {
-        const match = path.match(route.pattern);
-        if (match) {
-          // 构造真实 HTML 的 URL，拼接查询参数
-          let target = route.file;
-          let extraParams = {};
-          if (route.params) {
-            extraParams = route.params(match);
-          }
-          const urlParams = new URLSearchParams(extraParams).toString();
-          if (urlParams) {
-            target += '?' + urlParams;
-          }
-
-          // 直接用框架加载目标页面，不改变浏览器地址
-          fetch(target)
-            .then(res => res.text())
-            .then(html => {
-              document.documentElement.innerHTML = html;
-            })
-            .catch(() => {
-              document.body.innerText = 'Page not found.';
-            });
-          return;
-        }
-      }
-
-      // 真正没有匹配到的，显示 404 信息
-      document.body.innerText = '404 - Page Not Found';
-    })();
-  </script>
-</head>
-<body style="font-family: sans-serif; text-align: center; padding-top: 100px;">
-  Loading...
-</body>
+<html lang="zh">
+    <head>
+        <meta charset="UTF-8">
+        <title>正在跳转</title>
+        <link rel="stylesheet" href="404.css">
+        <script src="./404.js"></script>
+    </head>
+    <body>
+        <noscript>
+            <h1>云中霞光</h1>
+            <hr><br>
+            <h3>看起来你没有开启或不支持 JavaScript</h3>
+            <h3>本网站需要 JavaScript 才能正常运行</h3>
+        </noscript>
+    </body>
 </html>
