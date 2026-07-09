@@ -1,8 +1,30 @@
-.hide {
-    display: none;
+:root {
+    --bg: #121212;
+    --text: #e0e0e0;
+    --primary: #90caf9;
 }
 
-.center {
- margin: auto;
- width: 50%;
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+}
+
+.hide {
+    display: none !important;
+}
+
+.error-code {
+    font-size: 48px;
+    color: var(--primary);
+}
+
+.block-center, .center {
+    display: grid;
+    justify-content: center;
+    align-items: center;
+}
+
+.text-center, .center {
+    text-align: center;
 }
