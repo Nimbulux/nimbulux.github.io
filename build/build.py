@@ -9,7 +9,6 @@ from pathlib import Path
 
 import markdown
 
-
 # 路径配置（相对于仓库根目录）
 POSTS_DIR = Path("posts")
 OUTPUT_DIR = Path("pages")
@@ -22,7 +21,14 @@ head_html = HEAD_PATH.read_text(encoding="utf-8")
 end_html = END_PATH.read_text(encoding="utf-8")
 
 # Markdown 转换器
-md = markdown.Markdown()
+md = markdown.Markdown(
+    extensions=['pymdownx.highlight', 'pymdownx.superfences'],
+    extension_configs={
+        'pymdownx.highlight': {
+            'css_class': 'highlight',
+        }
+    }
+)
 
 # 收集所有文章信息
 all_articles = []                 # 元素: (article_dict, last_modified)
