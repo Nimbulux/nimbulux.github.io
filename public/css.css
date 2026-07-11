@@ -1,24 +1,15 @@
 :root {
     --bg: #121212;
     --text: #e0e0e0;
+    --highlight-bg: #1e1e1e;
 }
 
 @media (prefers-color-scheme: light) {
     :root {
         --text: #121212;
         --bg: #e0e0e0;
+        --highlight-bg: #f6f8fa;
     }
-}
-
-body {
-    background-color: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-}
-
-a {
-    text-decoration: none;
-    color: var(--text);
 }
 
 .hide-shell {
@@ -31,3 +22,203 @@ a {
     align-items: center;
     text-align: center;
 }
+
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    margin: 0;
+}
+
+a {
+    text-decoration: none;
+    color: var(--text);
+}
+
+/* ===== 文章排版样式 ===== */
+article {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.8;
+    word-break: break-word;
+}
+
+/* 标题 */
+article h1 { font-size: 2em; margin-top: 1em; border-bottom: 1px solid var(--text); padding-bottom: 0.3em; opacity: 0.8; }
+article h2 { font-size: 1.5em; margin-top: 1em; }
+article h3 { font-size: 1.25em; margin-top: 1em; }
+
+/* 段落 */
+article p { margin: 1em 0; }
+
+/* 列表 */
+article ul, article ol { padding-left: 2em; margin: 1em 0; }
+
+/* 代码块与行内代码 */
+article pre {
+    background: rgba(128,128,128,0.15);
+    padding: 15px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 0.9em;
+}
+article code {
+    background: rgba(128,128,128,0.15);
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-size: 0.9em;
+}
+article pre code {
+    background: none;
+    padding: 0;
+}
+
+/* 引用块 */
+article blockquote {
+    border-left: 4px solid var(--text);
+    margin: 1em 0;
+    padding: 0.5em 1em;
+    background: rgba(128,128,128,0.1);
+    opacity: 0.85;
+}
+
+/* 表格 */
+article table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+article th, article td {
+    border: 1px solid var(--text);
+    padding: 8px;
+    text-align: left;
+    opacity: 0.7;
+}
+article th {
+    background: rgba(128,128,128,0.15);
+}
+
+/* 图片 */
+article img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    margin: 1em 0;
+}
+
+/* 文章内链接 */
+article a {
+    color: var(--text);
+    text-decoration: underline;
+    opacity: 0.9;
+}
+article a:hover {
+    opacity: 1;
+}
+
+/* 水平线 */
+article hr {
+    border: none;
+    border-top: 1px solid var(--text);
+    opacity: 0.2;
+    margin: 2em 0;
+}
+
+/* ===== 代码高亮颜色变量 ===== */
+:root {
+    --highlight-bg: #1e1e1e;
+    --highlight-text: #d4d4d4;
+    --highlight-comment: #6a9955;
+    --highlight-keyword: #569cd6;
+    --highlight-string: #ce9178;
+    --highlight-number: #b5cea8;
+    --highlight-operator: #d4d4d4;
+    --highlight-name: #dcdcaa;
+    --highlight-deleted: #f44747;
+    --highlight-inserted: #6a9955;
+    --highlight-heading: #dcdcaa;
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --highlight-bg: #f6f8fa;
+        --highlight-text: #24292e;
+        --highlight-comment: #6a737d;
+        --highlight-keyword: #d73a49;
+        --highlight-string: #032f62;
+        --highlight-number: #005cc5;
+        --highlight-operator: #d73a49;
+        --highlight-name: #6f42c1;
+        --highlight-deleted: #b31d28;
+        --highlight-inserted: #22863a;
+        --highlight-heading: #6f42c1;
+    }
+}
+
+/* 高亮代码块容器 */
+article .highlight {
+    background: var(--highlight-bg);
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 1em 0;
+    /* 确保不继承透明背景 */
+}
+article .highlight pre {
+    background: var(--highlight-bg) !important;  /* 覆盖普通透明背景 */
+    padding: 15px;
+    margin: 0;
+    border-radius: 6px;
+}
+article .highlight code {
+    background: none;
+    padding: 0;
+    color: var(--highlight-text);
+}
+
+/* Pygments / pymdownx 通用类名样式 */
+.highlight .c   { color: var(--highlight-comment); font-style: italic; }  /* 注释 */
+.highlight .k   { color: var(--highlight-keyword); font-weight: bold; }   /* 关键字 */
+.highlight .kc  { color: var(--highlight-keyword); }
+.highlight .kd  { color: var(--highlight-keyword); }
+.highlight .kn  { color: var(--highlight-keyword); }
+.highlight .kp  { color: var(--highlight-keyword); }
+.highlight .kr  { color: var(--highlight-keyword); }
+.highlight .kt  { color: var(--highlight-keyword); }
+.highlight .s   { color: var(--highlight-string); }                      /* 字符串 */
+.highlight .s2  { color: var(--highlight-string); }
+.highlight .se  { color: var(--highlight-string); }
+.highlight .sh  { color: var(--highlight-string); }
+.highlight .si  { color: var(--highlight-string); }
+.highlight .sx  { color: var(--highlight-string); }
+.highlight .sr  { color: var(--highlight-string); }
+.highlight .s1  { color: var(--highlight-string); }
+.highlight .ss  { color: var(--highlight-string); }
+.highlight .m   { color: var(--highlight-number); }                      /* 数字 */
+.highlight .mi  { color: var(--highlight-number); }
+.highlight .mf  { color: var(--highlight-number); }
+.highlight .mh  { color: var(--highlight-number); }
+.highlight .o   { color: var(--highlight-operator); }                    /* 操作符 */
+.highlight .ow  { color: var(--highlight-operator); }
+.highlight .n   { color: var(--highlight-name); }                        /* 名称 */
+.highlight .na  { color: var(--highlight-name); }
+.highlight .nb  { color: var(--highlight-name); }
+.highlight .nc  { color: var(--highlight-name); font-weight: bold; }
+.highlight .no  { color: var(--highlight-name); }
+.highlight .nd  { color: var(--highlight-name); }
+.highlight .ni  { color: var(--highlight-name); }
+.highlight .ne  { color: var(--highlight-name); }
+.highlight .nf  { color: var(--highlight-name); }
+.highlight .nl  { color: var(--highlight-name); }
+.highlight .nn  { color: var(--highlight-name); }
+.highlight .nt  { color: var(--highlight-name); }
+.highlight .nv  { color: var(--highlight-name); }
+.highlight .vc  { color: var(--highlight-name); }
+.highlight .vg  { color: var(--highlight-name); }
+.highlight .vi  { color: var(--highlight-name); }
+.highlight .il  { color: var(--highlight-number); }
+.highlight .gd  { color: var(--highlight-deleted); }                     /* 删除 */
+.highlight .gi  { color: var(--highlight-inserted); }                    /* 插入 */
+.highlight .gh  { color: var(--highlight-heading); font-weight: bold; }
+.highlight .gu  { color: var(--highlight-comment); }
