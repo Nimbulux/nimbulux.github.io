@@ -1,0 +1,1 @@
+document.getElementById("pathShow").textContent = location.pathname;
