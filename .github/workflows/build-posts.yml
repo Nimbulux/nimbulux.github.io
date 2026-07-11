@@ -36,6 +36,6 @@ jobs:
         with:
           commit_message: "chore: auto-build posts [skip ci]"
           branch: main
-          file_pattern: 'app/'
+          file_pattern: 'pages/**'
           commit_user_name: github-actions[bot]
           commit_user_email: github-actions[bot]@users.noreply.github.com
