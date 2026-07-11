@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'posts/**'
+  workflow_dispatch:   # 允许手动触发
 
 jobs:
   build:
@@ -28,7 +29,7 @@ jobs:
         run: pip install markdown pygments pymdown-extensions
 
       - name: Build posts
-        run: python scripts/build_posts.py
+        run: python build/build.py
 
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v5
