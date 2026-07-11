@@ -9,5 +9,5 @@ docs/
         分类/
             文章/
                 page.md
-                info.txt
+                info.json
                 其他文件
