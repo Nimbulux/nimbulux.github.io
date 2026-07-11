@@ -14,24 +14,14 @@
     }
 }
 
-[data-theme="dark"] {
-    --bg: #121212;
-    --text: #e0e0e0;
-    --primary: #90caf9;
-    --surface: #1e1e1e;
-}
-
-[data-theme="light"] {
-    --text: #121212;
-    --bg: #e0e0e0;
-    --primary: #f99290;
-    --surface: #f5f5f5;
-}
-
 body {
     background-color: var(--bg);
     color: var(--text);
     min-height: 100vh;
+}
+
+p {
+    color: gray;
 }
 
 .error-code {
@@ -39,113 +29,9 @@ body {
     color: var(--primary);
 }
 
-.hide {
-    display: none !important;
-}
-
-.block-center, .center {
+.center {
     display: grid;
     justify-content: center;
     align-items: center;
-}
-
-.text-center, .center {
     text-align: center;
-}
-
-.left {
-    display: grid;
-    justify-content: left;
-    justify-items: start;
-    align-items: start;
-}
-
-.right {
-    display: grid;
-    justify-content: right;
-    justify-items: end;
-    align-items: end;
-}
-
-/* ========== 主题切换器（折叠下拉菜单） ========== */
-.theme-switcher {
-    position: fixed;
-    top: 1rem;
-    right: 1rem;
-    z-index: 9999;
-}
-
-/* 触发按钮 */
-.theme-switcher__toggle {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
-    font-size: 1.2rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: 0.2s;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-
-.theme-switcher__toggle:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-}
-
-/* 下拉菜单容器 */
-.theme-switcher__menu {
-    position: absolute;
-    top: 50px;            /* 按钮下方 */
-    right: 0;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-    padding: 0.5rem 0;
-    min-width: 140px;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-8px);
-    transition: opacity 0.2s, visibility 0.2s, transform 0.2s;
-}
-
-/* 展开状态 */
-.theme-switcher--open .theme-switcher__menu {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
-
-/* 每个选项 */
-.theme-option {
-    display: block;
-    width: 100%;
-    padding: 0.6rem 1.2rem;
-    border: none;
-    background: transparent;
-    color: var(--text);
-    text-align: left;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: background 0.15s;
-}
-
-.theme-option:hover {
-    background: var(--border);
-}
-
-.theme-option.active {
-    font-weight: 600;
-    position: relative;
-}
-
-.theme-option.active::after {
-    content: " ✓";
-    font-size: 0.8rem;
-    color: var(--text);
 }
