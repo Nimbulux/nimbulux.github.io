@@ -27,9 +27,15 @@ jobs:
 
       - name: Install dependencies
         run: pip install markdown pygments pymdown-extensions
+      
+      - name: Debug - List directory
+        run: ls -a || echo "pages not found"
 
       - name: Build posts
         run: python build/build.py
+
+      - name: Debug - List directory
+        run: ls -a || echo "pages not found"
 
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v5
