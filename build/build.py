@@ -23,6 +23,8 @@ md = markdown.Markdown(
     extension_configs={
         'pymdownx.highlight': {
             'css_class': 'highlight',
+            'linenums': True,           # 启用行号
+            'linenums_style': 'table',  # 或 'pymdownx-inline'
         }
     }
 )
