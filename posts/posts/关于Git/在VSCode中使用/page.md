@@ -84,3 +84,27 @@
 *不管也行 你重写然后重新提交也是可以的*  
 *他会自己帮你把这些失败的内容清除*  
 *30d有效期吧 好像*
+
+### 一些同步
+
+同步所有`git push -all`  
+
+当你的执行出现
+
+```text
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'https://XXX/XXX/XXX'
+hint: Updates were rejected because the remote contains work that you do not
+hint: have locally. This is usually caused by another repository pushing to
+hint: the same ref. If you want to integrate the remote changes, use
+hint: 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+```
+
+就代表远程库比你快  
+拉下来提交  
+**不要用变基(rebase) 大概率会变得不幸**  
+`git pull origin main --no-rebase`拉取  
+然后就完事*或者处理冲突然后完事*
+
+再重新push就好了
