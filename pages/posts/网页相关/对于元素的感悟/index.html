@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8">
+        <title>云中霞光-文章浏览</title>
+        <link rel="stylesheet" href="/public/css.css">
+        <script src="/public/js.js" defer></script>
+    </head>
+    <body class="article-page">
+        <header class="site-header">
+            <h1><a href="/">云中霞光</a></h1>
+            <hr><br>
+        </header><article><h1>对于元素的感悟</h1>
+<p>元素中class和id怎么使用，和css与JavaScript的使用的相关性。</p>
+<h2>起因</h2>
+<p>在与AI对话的过程中，我向她询问网页的设计相关问题。
+灵感的来源就在多个对话中。
+在要用到JavaScript功能的页面中，元素的引用几乎都是id索引，
+而在美化也就是使用css为主的页面中，我发现元素身上基本都是class。
+这个发现引起了我的注意，我在脑中记下了。</p>
+<h2>经过</h2>
+<p>在后续进一步美化的过程中，我发现她的示例代码中对于元素隐藏的控制...
+她在相关代码中使用JavaScript操作了元素的class值，并且强调了前方有空格。
+这让我想起我小时候翻看网站代码的时候。
+小时候的我发现class中有好几个词条用空格间隔，
+而每个元素对应的id却只有一个，并且命名中也没有<code>-</code>之类的符号。</p>
+<h2>发现</h2>
+<p>我向她开始询问相关事项:</p>
+<blockquote>
+<ul>
+<li><strong>Q: 关于id和class是否有命名规范？</strong><br />
+A:</li>
+</ul>
+<div class="highlight"><pre><span></span><code>不算规范，是命名的建议与习惯。
+因为css的内部样式都是词与词间`-`号链接，
+而JavaScript中内部命名是以`驼峰`的样式。
+于是形成了相关的命名。
+</code></pre></div>
+<ul>
+<li><strong>Q: 关于class与id是否可以理解为一个用于css一个用于id</strong>
+A:</li>
+</ul>
+<p><div class="highlight"><pre><span></span><code>可以这么理解。
+class命名可重复
+id命名唯一
+</code></pre></div>
+</p>
+</blockquote>
+<h2>结论</h2>
+<p>*<em>本人观点哦，不要当成圣经!</em></p>
+<h3>感悟</h3>
+<p>id像是元素的标识 是每个对象的"身份证"
+class像是元素的标签 是用来给对象分类的</p>
+<h3>技巧</h3>
+<p>对于class的操作
+其实每个对象有classList
+JavaScript可以直接进行 切换、删除、添加等 操作
+不必像AI说的一样用字符串操作
+在以后有相关的代码可以注意一下</p></article>
+        <footer class="site-footer">
+            <br><hr>
+            <p class="center">Copyright (C) 2026 Nimbulux_</p>
+        </footer>
+    </body>
+</html>
