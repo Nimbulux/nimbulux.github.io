@@ -74,6 +74,29 @@
 <p><em>不管也行 你重写然后重新提交也是可以的</em><br />
 <em>他会自己帮你把这些失败的内容清除</em><br />
 <em>30d有效期吧 好像</em></p>
+<h3>一些同步</h3>
+<p>同步所有<code>git push -all</code>  </p>
+<p>当你的执行出现</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span></pre></div></td><td class="code"><div><pre><span></span><code> ! [rejected]        main -&gt; main (fetch first)
+error: failed to push some refs to &#39;https://XXX/XXX/XXX&#39;
+hint: Updates were rejected because the remote contains work that you do not
+hint: have locally. This is usually caused by another repository pushing to
+hint: the same ref. If you want to integrate the remote changes, use
+hint: &#39;git pull&#39; before pushing again.
+hint: See the &#39;Note about fast-forwards&#39; in &#39;git push --help&#39; for details.
+</code></pre></div></td></tr></table></div>
+<p>就代表远程库比你快<br />
+拉下来提交<br />
+<strong>不要用变基(rebase) 大概率会变得不幸</strong><br />
+<code>git pull origin main --no-rebase</code>拉取<br />
+然后就完事<em>或者处理冲突然后完事</em></p>
+<p>再重新push就好了</p>
         </article>
         <footer class="site-footer">
             <br><hr>
