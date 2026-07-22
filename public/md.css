@@ -1,0 +1,197 @@
+:root {
+    --highlight-bg: #1e1e1e;
+    --highlight-text: #d4d4d4;
+    --highlight-comment: #6a9955;
+    --highlight-keyword: #569cd6;
+    --highlight-string: #ce9178;
+    --highlight-number: #b5cea8;
+    --highlight-operator: #d4d4d4;
+    --highlight-function: #dcdcaa;
+    --highlight-class: #4ec9b0;
+    --highlight-builtin: #569cd6;
+    --highlight-regex: #d16969;
+    --highlight-deleted: #f44747;
+    --highlight-inserted: #6a9955;
+    --highlight-escape: #d7ba7d;
+    --highlight-heading: #dcdcaa;
+    --highlight-error: #f44747;
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --highlight-bg: #f6f8fa;
+        --highlight-text: #24292e;
+        --highlight-comment: #6a737d;
+        --highlight-keyword: #d73a49;
+        --highlight-string: #032f62;
+        --highlight-number: #005cc5;
+        --highlight-operator: #d73a49;
+        --highlight-function: #6f42c1;
+        --highlight-class: #6f42c1;
+        --highlight-builtin: #005cc5;
+        --highlight-regex: #032f62;
+        --highlight-deleted: #b31d28;
+        --highlight-inserted: #22863a;
+        --highlight-escape: #032f62;
+        --highlight-heading: #6f42c1;
+        --highlight-error: #b31d28;
+    }
+}
+
+/* 代码块容器 */
+article .highlight {
+    background: var(--highlight-bg);
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1.2em 0;
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.2);
+    border: 1px solid rgba(128,128,128,0.2);
+}
+article .highlight pre {
+    background: transparent !important;
+    padding: 16px;
+    margin: 0;
+    font-size: 0.9em;
+    line-height: 1.5;
+    color: var(--highlight-text);
+    tab-size: 4;
+}
+article .highlight code {
+    background: none;
+    padding: 0;
+    color: inherit;
+    font-family: 'Maple Mono NF CN', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
+}
+
+/* 行号 */
+article .highlight table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0;
+    border: none;
+    background: transparent;
+}
+article .highlight td {
+    border: none;
+    padding: 0;
+    vertical-align: top;
+}
+article .highlight .linenos {
+    color: #858585;
+    background: inherit;
+    padding: 16px 10px 16px 16px;
+    text-align: right;
+    user-select: none;
+    border-right: 1px solid rgba(128,128,128,0.3);
+}
+
+/* 普通标识符 → 正文色（关键修正） */
+article .highlight .n,
+article .highlight .na,
+article .highlight .bp,
+article .highlight .vc,
+article .highlight .vg,
+article .highlight .vi,
+article .highlight .nv,
+article .highlight .p {
+    color: var(--highlight-text);
+}
+/* 函数/方法 */
+article .highlight .nf,
+article .highlight .fm {
+    color: var(--highlight-function);
+}
+/* 类/命名空间 */
+article .highlight .nc,
+article .highlight .nn,
+article .highlight .nt {
+    color: var(--highlight-class);
+    font-weight: bold;
+}
+/* 内置名称（如 print, True） */
+article .highlight .nb {
+    color: var(--highlight-builtin);
+}
+
+/* 注释 */
+article .highlight .c,
+article .highlight .cm,
+article .highlight .cp,
+article .highlight .c1,
+article .highlight .cs {
+    color: var(--highlight-comment);
+    font-style: italic;
+}
+/* 关键字 */
+article .highlight .k,
+article .highlight .kc,
+article .highlight .kd,
+article .highlight .kn,
+article .highlight .kp,
+article .highlight .kr,
+article .highlight .kt {
+    color: var(--highlight-keyword);
+    font-weight: bold;
+}
+/* 字符串 */
+article .highlight .s,
+article .highlight .sb,
+article .highlight .sc,
+article .highlight .sd,
+article .highlight .s2,
+article .highlight .se,
+article .highlight .sh,
+article .highlight .si,
+article .highlight .sx,
+article .highlight .sr,
+article .highlight .s1,
+article .highlight .ss {
+    color: var(--highlight-string);
+}
+/* 数字 */
+article .highlight .m,
+article .highlight .mb,
+article .highlight .mf,
+article .highlight .mh,
+article .highlight .mi,
+article .highlight .mo,
+article .highlight .il {
+    color: var(--highlight-number);
+}
+/* 操作符 */
+article .highlight .o,
+article .highlight .ow {
+    color: var(--highlight-operator);
+}
+/* 正则/转义 */
+article .highlight .sr,
+article .highlight .se {
+    color: var(--highlight-regex);
+}
+/* 差异标记 */
+article .highlight .gd { color: var(--highlight-deleted); background: rgba(244,71,71,0.1); }
+article .highlight .gi { color: var(--highlight-inserted); background: rgba(106,153,85,0.1); }
+article .highlight .gh { color: var(--highlight-heading); font-weight: bold; }
+article .highlight .gu { color: var(--highlight-comment); }
+/* 错误 */
+article .highlight .err {
+    color: var(--highlight-error);
+    border-bottom: 1px dotted var(--highlight-error);
+}
+/* 选中文本 */
+article .highlight ::selection {
+    background: rgba(86,156,214,0.3);
+    color: inherit;
+}
+
+/* 保持原有透明预块样式（不影响高亮块） */
+article pre:not(.highlight pre) {
+    background: rgba(128,128,128,0.15);
+    padding: 15px;
+    border-radius: 6px;
+    overflow-x: auto;
+}
+article pre code:not(.highlight code) {
+    background: none;
+    padding: 0;
+}

@@ -12,13 +12,10 @@ import markdown
 # 路径配置（相对于仓库根目录）
 POSTS_DIR = Path("posts")
 OUTPUT_DIR = Path("pages")
-HEAD_PATH = Path("build/head.html")
-END_PATH = Path("build/end.html")
+PAGE_TEMPLATE_PATH = Path("build/page.html")   # 文章包裹模板
+HOME_TEMPLATE_PATH = Path("build/home.html")   # 首页模板
+INDEX_OUTPUT_PATH = Path("index.html")         # 生成的首页
 DOCS_LIST_DIR = OUTPUT_DIR / "docs"
-
-# 读取模板
-head_html = HEAD_PATH.read_text(encoding="utf-8")
-end_html = END_PATH.read_text(encoding="utf-8")
 
 # Markdown 转换器
 md = markdown.Markdown(
@@ -26,13 +23,14 @@ md = markdown.Markdown(
     extension_configs={
         'pymdownx.highlight': {
             'css_class': 'highlight',
+            'linenums': True,           # 启用行号
+            'linenums_style': 'table',  # 或 'pymdownx-inline'
         }
     }
 )
 
 # 收集所有文章信息
 all_articles = []                 # 元素: (article_dict, last_modified)
-# 按项目分组的文章，key = 项目名，仅包含具体文章（不含项目首页）
 project_articles = defaultdict(list)   # value: [(article_dict, last_modified), ...]
 
 
@@ -54,19 +52,30 @@ def process_article(article_dir: Path):
     # 确定最后修改时间
     last_modified = info.get("updated") or info["date"]
 
+    # 读取文章 Markdown 正文
+    md_content = page_file.read_text(encoding="utf-8")
+
     # 计算阅读时间（如果未提供）
     if "reading_time" not in info or not info["reading_time"]:
-        md_content = page_file.read_text(encoding="utf-8")
         info["reading_time"] = calculate_reading_time(md_content)
-    else:
-        md_content = page_file.read_text(encoding="utf-8")
 
     # Markdown → HTML
     body_html = md.convert(md_content)
-    full_html = f"{head_html}<article>{body_html}</article>{end_html}"
+
+    # 使用 page.html 模板包裹正文
+    if PAGE_TEMPLATE_PATH.exists():
+        template = PAGE_TEMPLATE_PATH.read_text(encoding="utf-8")
+        if "$$$===REPLACE===$$$" in template:
+            full_html = template.replace("$$$===REPLACE===$$$", body_html)
+        else:
+            print(f"警告：{PAGE_TEMPLATE_PATH} 中未找到占位符，正文将不会被包裹")
+            full_html = body_html
+    else:
+        print(f"警告：未找到文章模板 {PAGE_TEMPLATE_PATH}，使用未包裹的正文")
+        full_html = body_html
 
     # 计算相对于 posts/ 的路径
-    relative_path = article_dir.relative_to(POSTS_DIR)  # 例如 "posts/技术/文章名" 或 "docs/项目X/大类/文章" 或 "docs/项目X"
+    relative_path = article_dir.relative_to(POSTS_DIR)
     dest_dir = OUTPUT_DIR / relative_path
     dest_dir.mkdir(parents=True, exist_ok=True)
 
@@ -91,26 +100,22 @@ def process_article(article_dir: Path):
         "path": f"/pages/{relative_path.as_posix()}/"
     }
 
-    # 判断是否为项目首页（即 docs/项目X 本身，只有两级）
+    # 判断是否为项目首页
     parts = relative_path.parts
     is_project_home = len(parts) == 2 and parts[0] == "docs"
 
     if is_project_home:
-        # 项目首页，标记类型
         article_entry["type"] = "project"
-        # 只加入全局列表，不加入项目文章分组
         all_articles.append((article_entry, last_modified))
     else:
-        # 普通文章，加入全局列表
         all_articles.append((article_entry, last_modified))
-        # 如果属于 docs 下的某个项目，加入对应的项目分组
         if len(parts) >= 3 and parts[0] == "docs":
-            project_name = parts[1]   # docs/项目X
+            project_name = parts[1]
             project_articles[project_name].append((article_entry, last_modified))
 
 
 def main():
-    # 清空旧的输出目录（pages 完全由脚本生成）
+    # 清空旧的输出目录
     if OUTPUT_DIR.exists():
         shutil.rmtree(OUTPUT_DIR)
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -135,8 +140,8 @@ def main():
         encoding="utf-8"
     )
 
-    # 生成各项目文章列表（不含项目首页）
-    DOCS_LIST_DIR.mkdir(parents=True, exist_ok=True)   # 其实就是 pages/docs
+    # 生成各项目文章列表
+    DOCS_LIST_DIR.mkdir(parents=True, exist_ok=True)
     for proj_name, articles in project_articles.items():
         proj_list = [entry for entry, _ in articles]
         list_dir = DOCS_LIST_DIR / proj_name
@@ -145,6 +150,26 @@ def main():
             json.dumps(proj_list, ensure_ascii=False, indent=2),
             encoding="utf-8"
         )
+
+    # ---------- 生成首页 ----------
+    if HOME_TEMPLATE_PATH.exists():
+        home_template = HOME_TEMPLATE_PATH.read_text(encoding="utf-8")
+        # 将文章列表打包为 <a> 链接
+        links_html = "<ul>\n"
+        for entry in global_list:
+            links_html += f'  <li><a href="{entry["path"]}">{entry["title"]}</a></li>\n'
+        links_html += "</ul>"
+
+        if "$$$===REPLACE===$$$" in home_template:
+            home_page = home_template.replace("$$$===REPLACE===$$$", links_html)
+        else:
+            print("警告：home.html 中未找到占位符，将直接使用原模板输出")
+            home_page = home_template
+
+        INDEX_OUTPUT_PATH.write_text(home_page, encoding="utf-8")
+        print("首页已生成 -> index.html")
+    else:
+        print(f"警告：未找到首页模板 {HOME_TEMPLATE_PATH}，跳过首页生成")
 
     print(f"构建完成！总文章/页面数：{len(global_list)}")
     for proj_name, articles in project_articles.items():
