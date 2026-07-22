@@ -5,16 +5,76 @@
         <meta charset="UTF-8">
         <title>云中霞光-文章浏览</title>
         <link rel="stylesheet" href="/public/css.css">
+        <link rel="stylesheet" href="/public/md.css">
         <script src="/public/js.js" defer></script>
     </head>
     <body class="article-page">
         <header class="site-header">
             <h1><a href="/">云中霞光</a></h1>
-            <hr><br>
-        </header><article><h1>在VSCode中使用Git</h1>
+            <hr>
+        </header>
+        <article>
+        <h1>在VSCode中使用Git</h1>
 <p>因为写这个网站的时候用到了Git
 也了解了很多东西
-于是写了这篇文章讲述一些感受</p></article>
+于是写了这篇文章讲述一些感受</p>
+<h2>一些配置?</h2>
+<p>首先
+真的是需要安装
+<code>Git Graph</code>
+这个扩展插件的
+因为这个插件真的几乎就可以很少的用命令行控制了
+或者说几乎不用命令行控制了  </p>
+<h3>对于Windows</h3>
+<p>安装<code>Git for Windows</code></p>
+<h3>对于Linux</h3>
+<p><em>你会装git的对吧 包管理器就好</em>  </p>
+<p>然后你只需要设置全局的email和name就几乎覆盖大部分的场景了<br />
+<em>不会配置可以去搜索</em></p>
+<h2>时机</h2>
+<p>大部分的操作完全不需要<code>Git Graph</code>这个插件提供的功能<br />
+默认的Git管理已经很好用了</p>
+<p>然后<br />
+需要<code>Git Graph</code>的地方就在于复杂的分支与合并上了  </p>
+<h2>我的操作</h2>
+<h3>分支内容同步</h3>
+<p><em>你现在分了一个支</em>  </p>
+<p>现在 你在主分支做了一些更新<br />
+然后你想要同步过来<br />
+此时 就到了你用这个拓展功能的时候了  </p>
+<p>切换到你的分支<br />
+让主分支向你的分支执行合并<br />
+然后为合并添加你分支的标签<br />
+我选择<code>create branch</code><br />
+输入你分支的名称<br />
+在窗口中选择<code>Yes, replace...</code>
+此时你的分支就加入了主分支的内容了</p>
+<p>也就相当于同步了一次内容<br />
+当然 可以随便用的 可以从一个位置同步到好几个分支</p>
+<h3>分支删除</h3>
+<p><em>有很多用完的分支</em><br />
+这时侯就到了删除分支的时候</p>
+<p>当你不删除分支<br />
+就算分支合并了<br />
+它也会继续显示<br />
+所以这个时候你需要将它删掉<br />
+用原本页面 直接删除分支即可</p>
+<p>当这个分支没有合并会提醒你</p>
+<h3>一些救急</h3>
+<p><em>刚刚commit了一次 checkout发现提交没了</em><br />
+此时就需要一些命令行的操作了</p>
+<p>也可能是我不太熟悉 但是这个时候我是用命令行的</p>
+<p><code>git reflog</code>找到你消失的提交<br />
+一般都是<code>XXXXXXX HEAD@{X}: commit: XXX</code>这个样子<br />
+然后用<code>git checkout XXXXXXX</code>切换过去<br />
+然后去<code>Git Graph</code>里<code>create branch</code><br />
+输入你提交的分支名 也就是应该提交在哪<br />
+在窗口中选择<code>Yes, replace...</code><br />
+完事了 就救回来了</p>
+<p><em>不管也行 你重写然后重新提交也是可以的</em><br />
+<em>他会自己帮你把这些失败的内容清除</em><br />
+<em>30d有效期吧 好像</em></p>
+        </article>
         <footer class="site-footer">
             <br><hr>
             <p class="center">Copyright (C) 2026 Nimbulux_</p>

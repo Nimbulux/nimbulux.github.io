@@ -5,13 +5,16 @@
         <meta charset="UTF-8">
         <title>云中霞光-文章浏览</title>
         <link rel="stylesheet" href="/public/css.css">
+        <link rel="stylesheet" href="/public/md.css">
         <script src="/public/js.js" defer></script>
     </head>
     <body class="article-page">
         <header class="site-header">
             <h1><a href="/">云中霞光</a></h1>
-            <hr><br>
-        </header><article><h1>对于元素的感悟</h1>
+            <hr>
+        </header>
+        <article>
+        <h1>对于元素的感悟</h1>
 <p>元素中class和id怎么使用，和css与JavaScript的使用的相关性。</p>
 <h2>起因</h2>
 <p>在与AI对话的过程中，我向她询问网页的设计相关问题。
@@ -32,19 +35,24 @@
 <li><strong>Q: 关于id和class是否有命名规范？</strong><br />
 A:</li>
 </ul>
-<div class="highlight"><pre><span></span><code>不算规范，是命名的建议与习惯。
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div><pre><span></span><code>不算规范，是命名的建议与习惯。
 因为css的内部样式都是词与词间`-`号链接，
 而JavaScript中内部命名是以`驼峰`的样式。
 于是形成了相关的命名。
-</code></pre></div>
+</code></pre></div></td></tr></table></div>
 <ul>
 <li><strong>Q: 关于class与id是否可以理解为一个用于css一个用于id</strong>
 A:</li>
 </ul>
-<p><div class="highlight"><pre><span></span><code>可以这么理解。
+<p><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code>可以这么理解。
 class命名可重复
 id命名唯一
-</code></pre></div>
+</code></pre></div></td></tr></table></div>
 </p>
 </blockquote>
 <h2>结论</h2>
@@ -57,7 +65,8 @@ class像是元素的标签 是用来给对象分类的</p>
 其实每个对象有classList
 JavaScript可以直接进行 切换、删除、添加等 操作
 不必像AI说的一样用字符串操作
-在以后有相关的代码可以注意一下</p></article>
+在以后有相关的代码可以注意一下</p>
+        </article>
         <footer class="site-footer">
             <br><hr>
             <p class="center">Copyright (C) 2026 Nimbulux_</p>
