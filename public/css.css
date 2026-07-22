@@ -12,10 +12,6 @@
     }
 }
 
-.hide-shell {
-    display: none;
-}
-
 .center {
     display: grid;
     justify-content: center;
