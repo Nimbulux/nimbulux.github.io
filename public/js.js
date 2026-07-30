@@ -1,30 +1,59 @@
 function wrapPage() {
-  var targetUrl = encodeURIComponent(window.location.href);
-  var fullShellUrl = '/app/?url=' + targetUrl;
+  if (!isModernBrowser()) return;
+  const iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
 
-  var shellFrame = document.createElement('iframe');
-  shellFrame.style.display = 'none';
-  shellFrame.src = fullShellUrl;
-  document.body.appendChild(shellFrame);
+  document.body.appendChild(iframe);
 
-  shellFrame.onload = function () {
+  iframe.src = `/app/?url=${window.location.pathname}`
+
+  iframe.onload = function () {
     try {
-      var shellDoc = shellFrame.contentDocument || shellFrame.contentWindow.document;
-      // 序列化完整的 HTML（含 DOCTYPE）
-      var shellHTML = '<!DOCTYPE html>' + shellDoc.documentElement.outerHTML;
+      const doc = iframe.contentDocument || iframe.contentWindow.document;
+      // 获取完整 HTML 字符串
+      const newHTML = doc.documentElement.outerHTML;
+
       document.open();
-      document.write(shellHTML);
+      document.write(newHTML);
       document.close();
     } catch (e) {
-      console.error('外壳替换失败 :\n', e);
+      console.warn('无法读取 iframe 内容', e);
     }
   };
-
-  shellFrame.onerror = function () {
-    console.error('外壳页面加载失败');
-  };
 }
 
-if (window.parent === window) {
-    wrapPage();
+function isModernBrowser() {
+  // 检测 CSS 能力（使用 CSS.supports）
+  const supportsFlex = CSS.supports('display', 'flex');
+  const supportsGrid = CSS.supports('display', 'grid');
+  const supportsVars = CSS.supports('--test', '0');
+
+  // 检测 ES6 语法支持（不能直接用箭头函数测试，可用 new Function）
+  let supportsArrow = false;
+  try {
+    new Function('() => {}');
+    supportsArrow = true;
+  } catch (e) {}
+
+  let supportsConst = false;
+  try {
+    eval('"use strict"; const x = 1;');
+    supportsConst = true;
+  } catch (e) {}
+
+  // 检测关键 API
+  const supportsPromise = typeof Promise === 'function';
+  const supportsFetch = typeof fetch === 'function';
+
+  return (
+    supportsFlex &&
+    supportsGrid &&
+    supportsVars &&
+    supportsArrow &&
+    supportsConst &&
+    supportsPromise &&
+    supportsFetch
+  );
 }
+
+wrapPage();
