@@ -212,14 +212,17 @@ def render_mixed_page(node: dict, output_html_path: Path, output_list_path: Path
     )
 
 
-def render_article_page(node: dict, output_dir: Path):
-    """渲染纯文章页面，复制附件"""
+def render_article_page(node: dict, output_dir: Path, html_output_path: Path|None = None):
+    """渲染纯文章页面，复制附件。如果提供 html_output_path，则直接将 HTML 写入该文件"""
     src_dir = POSTS_DIR / node["relative_path"]
     html = generate_article_html(src_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
-    (output_dir / "index.html").write_text(html, encoding="utf-8")
 
-    # 复制附件（排除 page.md 和 info.json）
+    output_dir.mkdir(parents=True, exist_ok=True)
+    # 决定 HTML 的写入位置
+    dest_html = html_output_path if html_output_path else (output_dir / "index.html")
+    dest_html.write_text(html, encoding="utf-8")
+
+    # 复制附件（仍然复制到 output_dir 下，即 pages/xxx 目录）
     for item in src_dir.iterdir():
         if item.name in ("page.md", "info.json"):
             continue
@@ -233,10 +236,8 @@ def render_article_page(node: dict, output_dir: Path):
 
 
 def generate_site(node: dict):
-    """递归生成整个站点"""
     rel = node["relative_path"]
     if rel == "":
-        # 根目录：index.html 和 pages/list.json
         out_html = INDEX_OUTPUT_PATH
         out_list = OUTPUT_DIR / "list.json"
     else:
@@ -253,9 +254,12 @@ def generate_site(node: dict):
         for child in node.get("children", []):
             generate_site(child)
     else:  # article
-        out_dir = OUTPUT_DIR / rel
-        render_article_page(node, out_dir)
-        # 纯文章节点无需递归（无子节点）
+        if rel == "":
+            # 根文章：HTML 写到根目录的 index.html，附件仍放在 pages 下（便于统一管理）
+            render_article_page(node, OUTPUT_DIR, html_output_path=INDEX_OUTPUT_PATH)
+        else:
+            out_dir = OUTPUT_DIR / rel
+            render_article_page(node, out_dir)
 
 
 # ========== 主流程 ==========
@@ -270,6 +274,7 @@ def main():
 
     # 构建目录树
     root_node = build_tree(POSTS_DIR, Path(""))
+    root_node["relative_path"] = ""   # 强制设为空字符串
     sort_tree(root_node)
 
     # 生成全部页面
