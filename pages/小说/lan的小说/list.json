@@ -1,0 +1,20 @@
+[
+  {
+    "name": "新建文件夹",
+    "type": "directory",
+    "relative_path": "小说/lan的小说/新建文件夹",
+    "children": []
+  },
+  {
+    "name": "新建文件夹 (2)",
+    "type": "directory",
+    "relative_path": "小说/lan的小说/新建文件夹 (2)",
+    "children": []
+  },
+  {
+    "name": "新建文件夹 (3)",
+    "type": "directory",
+    "relative_path": "小说/lan的小说/新建文件夹 (3)",
+    "children": []
+  }
+]
