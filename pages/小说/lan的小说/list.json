@@ -1,20 +1,261 @@
 [
   {
-    "name": "新建文件夹",
+    "name": "中奖概率倍高",
     "type": "directory",
-    "relative_path": "小说/lan的小说/新建文件夹",
+    "relative_path": "小说/lan的小说/中奖概率倍高",
     "children": []
   },
   {
-    "name": "新建文件夹 (2)",
+    "name": "甜同甜",
     "type": "directory",
-    "relative_path": "小说/lan的小说/新建文件夹 (2)",
-    "children": []
+    "relative_path": "小说/lan的小说/甜同甜",
+    "children": [
+      {
+        "name": "综艺节目的片尾字幕从屏幕底部缓缓",
+        "type": "article",
+        "relative_path": "小说/lan的小说/甜同甜/综艺节目的片尾字幕从屏幕底部缓缓",
+        "info": {
+          "title": "综艺节目的片尾字幕从屏幕底部缓缓",
+          "excerpt": "综艺节目的片尾字幕从屏幕底部缓缓升起的时候，小遥已经在凛的大腿上睡着了。",
+          "date": "2026-08-01T09:37:30Z",
+          "updated": "2026-08-01T09:37:30Z",
+          "tags": [
+            "双女主"
+          ],
+          "reading_time": 32
+        }
+      },
+      {
+        "name": "小遥在黑暗中睁着眼睛",
+        "type": "article",
+        "relative_path": "小说/lan的小说/甜同甜/小遥在黑暗中睁着眼睛",
+        "info": {
+          "title": "小遥在黑暗中睁着眼睛",
+          "excerpt": "小遥在黑暗中睁着眼睛。",
+          "date": "2026-07-31T08:32:30Z",
+          "updated": "2026-07-31T08:32:30Z",
+          "tags": [
+            "双女主"
+          ],
+          "reading_time": 57
+        }
+      },
+      {
+        "name": "九月的第二个周末",
+        "type": "article",
+        "relative_path": "小说/lan的小说/甜同甜/九月的第二个周末",
+        "info": {
+          "title": "九月的第二个周末",
+          "excerpt": "九月的第二个周末，大雨之后天空干净得像是被人用湿布反复擦过的窗玻璃。",
+          "date": "2026-07-16T13:07:30Z",
+          "updated": "2026-07-16T13:07:30Z",
+          "tags": [
+            "双女主"
+          ],
+          "reading_time": 34
+        }
+      },
+      {
+        "name": "月がきれいですね",
+        "type": "article",
+        "relative_path": "小说/lan的小说/甜同甜/月がきれいですね",
+        "info": {
+          "title": "月がきれいですね",
+          "excerpt": "九月初的东京，雨季的尾巴还拖在空气里，迟迟不肯走。",
+          "date": "2026-07-14T22:50:30Z",
+          "updated": "2026-07-14T22:50:30Z",
+          "tags": [
+            "双女主"
+          ],
+          "reading_time": 14
+        }
+      },
+      {
+        "name": "原宿站前",
+        "type": "article",
+        "relative_path": "小说/lan的小说/甜同甜/原宿站前",
+        "info": {
+          "title": "原宿站前",
+          "excerpt": "原宿站前，竹下口的闸机外面，周日的人潮还没有到最汹涌的时候，但已经足够让狭窄的竹下通看起来像一条被糖果和广告牌塞满的河流。",
+          "date": "2026-07-14T21:43:30Z",
+          "updated": "2026-07-14T21:43:30Z",
+          "tags": [
+            "双女主"
+          ],
+          "reading_time": 13
+        }
+      },
+      {
+        "name": "手机响的时候",
+        "type": "article",
+        "relative_path": "小说/lan的小说/甜同甜/手机响的时候",
+        "info": {
+          "title": "手机响的时候",
+          "excerpt": "手机响的时候，凛正在電車上。",
+          "date": "2026-07-13T23:26:30Z",
+          "updated": "2026-07-13T23:26:30Z",
+          "tags": [
+            "双女主"
+          ],
+          "reading_time": 22
+        }
+      },
+      {
+        "name": "周一早上的光线和周日不太一样",
+        "type": "article",
+        "relative_path": "小说/lan的小说/甜同甜/周一早上的光线和周日不太一样",
+        "info": {
+          "title": "周一早上的光线和周日不太一样",
+          "excerpt": "周一早上的光线和周日不太一样。",
+          "date": "2026-07-12T22:52:30Z",
+          "updated": "2026-07-12T22:52:30Z",
+          "tags": [
+            "双女主"
+          ],
+          "reading_time": 17
+        }
+      },
+      {
+        "name": "周日早上",
+        "type": "article",
+        "relative_path": "小说/lan的小说/甜同甜/周日早上",
+        "info": {
+          "title": "周日早上",
+          "excerpt": "周日早上，凛是被自己的心跳声吵醒的。",
+          "date": "2026-07-10T01:02:30Z",
+          "updated": "2026-07-10T01:02:30Z",
+          "tags": [
+            "双女主"
+          ],
+          "reading_time": 27
+        }
+      },
+      {
+        "name": "周六下午",
+        "type": "article",
+        "relative_path": "小说/lan的小说/甜同甜/周六下午",
+        "info": {
+          "title": "周六下午",
+          "excerpt": "周六下午，凛在客厅的こたつ里改论文的时候，小遥从便利店下班回来了。",
+          "date": "2026-07-08T13:16:30Z",
+          "updated": "2026-07-08T13:16:30Z",
+          "tags": [
+            "双女主"
+          ],
+          "reading_time": 31
+        }
+      },
+      {
+        "name": "从卡拉OK出来的时候",
+        "type": "article",
+        "relative_path": "小说/lan的小说/甜同甜/从卡拉OK出来的时候",
+        "info": {
+          "title": "从卡拉OK出来的时候",
+          "excerpt": "从卡拉OK出来的时候，天边已经开始泛白了。",
+          "date": "2026-07-07T12:43:30Z",
+          "updated": "2026-07-07T12:43:30ZZ",
+          "tags": [
+            "双女主"
+          ],
+          "reading_time": 26
+        }
+      },
+      {
+        "name": "凛的手机震了两下的时候",
+        "type": "article",
+        "relative_path": "小说/lan的小说/甜同甜/凛的手机震了两下的时候",
+        "info": {
+          "title": "凛的手机震了两下的时候",
+          "excerpt": "凛的手机震了两下的时候，她正把最后一只袜子从晾衣架上扯下来。",
+          "date": "2026-07-05T23:58:30Z",
+          "updated": "2026-07-05T23:58:30Z",
+          "tags": [
+            "双女主"
+          ],
+          "reading_time": 11
+        }
+      }
+    ]
   },
   {
-    "name": "新建文件夹 (3)",
-    "type": "directory",
-    "relative_path": "小说/lan的小说/新建文件夹 (3)",
-    "children": []
+    "name": "无名小说1-弃坑",
+    "type": "mixed",
+    "relative_path": "小说/lan的小说/无名小说1-弃坑",
+    "info": {
+      "title": "lan的小说",
+      "excerpt": "lan几乎所有的小说",
+      "date": "2026-07-30T23:00:30Z",
+      "updated": "2026-07-30T23:00:30Z",
+      "tags": [
+        "文件夹"
+      ],
+      "reading_time": 1
+    },
+    "children": [
+      {
+        "name": "我跨出空间裂隙的那一瞬间",
+        "type": "article",
+        "relative_path": "小说/lan的小说/无名小说1-弃坑/我跨出空间裂隙的那一瞬间",
+        "info": {
+          "title": "这是逃亡的第一个夜晚",
+          "excerpt": "这是逃亡的第一个夜晚。",
+          "date": "2026-06-27T01:30:30Z",
+          "updated": "2026-06-27T12:27:30Z",
+          "tags": [
+            "弃坑",
+            "无名小说1"
+          ],
+          "reading_time": 5
+        }
+      },
+      {
+        "name": "这是逃亡的第一个夜晚",
+        "type": "article",
+        "relative_path": "小说/lan的小说/无名小说1-弃坑/这是逃亡的第一个夜晚",
+        "info": {
+          "title": "这是逃亡的第一个夜晚",
+          "excerpt": "这是逃亡的第一个夜晚。",
+          "date": "2026-06-27T01:30:30Z",
+          "updated": "2026-06-27T12:27:30Z",
+          "tags": [
+            "弃坑",
+            "无名小说1"
+          ],
+          "reading_time": 14
+        }
+      },
+      {
+        "name": "我不知道",
+        "type": "article",
+        "relative_path": "小说/lan的小说/无名小说1-弃坑/我不知道",
+        "info": {
+          "title": "我不知道",
+          "excerpt": "夜如期而至，裹着雨后的潮气，从窗缝里渗进来。",
+          "date": "2026-06-26T01:08:30Z",
+          "updated": "2026-06-26T01:08:30Z",
+          "tags": [
+            "弃坑",
+            "无名小说1"
+          ],
+          "reading_time": 9
+        }
+      },
+      {
+        "name": "夜如期而至",
+        "type": "article",
+        "relative_path": "小说/lan的小说/无名小说1-弃坑/夜如期而至",
+        "info": {
+          "title": "夜如期而至",
+          "excerpt": "夜如期而至，裹着雨后的潮气，从窗缝里渗进来。",
+          "date": "2026-06-25T21:41:30Z",
+          "updated": "2026-06-25T21:41:30Z",
+          "tags": [
+            "弃坑",
+            "无名小说1"
+          ],
+          "reading_time": 13
+        }
+      }
+    ]
   }
 ]
