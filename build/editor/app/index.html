@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>文章编辑系统</title>
+  <link rel="stylesheet" href="css.css">
+  <!-- Markdown 预览样式（GitHub 风格） -->
+  <link rel="stylesheet" href="github-markdown.min.css">
+</head>
+<body>
+  <div id="app">
+    <!-- 左侧面板 -->
+    <div id="left-panel">
+      <div id="dir-selector">
+        <button id="select-dir-btn">📂 选择文章目录</button>
+        <div id="current-dir-path" class="dir-path">未选择目录</div>
+      </div>
+      <div id="tree-wrapper">
+        <ul id="tree-root" class="tree"></ul>
+      </div>
+      <!-- 信息面板拖拽分隔条 -->
+      <div id="info-resize-handle"></div>
+      <div id="info-panel" style="display: none;">
+        <h4>文章信息</h4>
+        <div class="info-field">
+          <label>标题</label>
+          <input type="text" id="info-title">
+        </div>
+        <div class="info-field">
+          <label>摘要</label>
+          <textarea id="info-excerpt" rows="3"></textarea>
+        </div>
+        <div class="info-field">
+          <label>发布日期</label>
+          <input type="datetime-local" id="info-date">
+        </div>
+        <div class="info-field">
+          <label>更新日期</label>
+          <input type="datetime-local" id="info-updated">
+        </div>
+        <div class="info-field">
+          <label>标签（逗号分隔）</label>
+          <input type="text" id="info-tags">
+        </div>
+        <div class="info-field">
+          <label>阅读时间（分钟）</label>
+          <input type="number" id="info-reading-time" min="1">
+          <button id="calc-reading-time">自动计算</button>
+        </div>
+        <div class="save-row">
+          <button id="save-info">保存信息</button>
+          <span id="save-status-icon" class="status-icon" style="display: none;"></span>
+        </div>
+        <div id="save-error-box" class="error-box" style="display: none;"></div>
+      </div>
+    </div>
+
+    <!-- 中间主分隔条 -->
+    <div id="main-resize-handle"></div>
+
+    <!-- 右侧编辑区 -->
+    <div id="right-panel">
+      <!-- 顶部工具栏 -->
+      <div id="toolbar">
+        <button id="dark-mode-toggle" title="切换暗色模式">🌙 暗色模式</button>
+      </div>
+      <!-- 编辑预览左右容器 -->
+      <div id="editor-preview-wrapper">
+        <div id="editor-area">
+          <textarea id="markdown-editor" placeholder="选择一篇文章开始编辑..."></textarea>
+        </div>
+        <div id="preview-resize-handle"></div>
+        <div id="preview-area">
+          <div id="preview-content" class="markdown-body"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 右键菜单容器 -->
+  <div id="context-menu" class="context-menu" style="display: none;">
+    <ul id="context-menu-list"></ul>
+  </div>
+
+  <!-- Marked 库 -->
+  <script src="marked.min.js"></script>
+  <script src="js.js"></script>
+</body>
+</html>
