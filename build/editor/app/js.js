@@ -3,7 +3,10 @@ let currentSelectedNode = null;
 let currentPath = "";
 let currentNodeType = "";
 let saveTimer = null;
-let syncScrollActive = false;   // 防止双向触发
+let syncScrollActive = false;
+
+// 展开状态集合（存储节点路径）
+let expandedPaths = new Set();
 
 // ---------- 初始化 ----------
 document.addEventListener('DOMContentLoaded', () => {
@@ -18,11 +21,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const dirPathSpan = document.getElementById('current-dir-path');
     const darkBtn = document.getElementById('dark-mode-toggle');
 
-    // 按钮事件绑定（放在最前，确保可用）
     selectBtn.addEventListener('click', async () => {
         const selected = await pywebview.api.select_directory();
         if (selected) {
             dirPathSpan.textContent = selected;
+            expandedPaths.clear();
             await loadTree();
         }
     });
@@ -33,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
         await pywebview.api.set_dark_mode(isDark);
     });
 
-    // 异步加载配置
     loadInitialConfig();
 });
 
@@ -46,17 +48,25 @@ async function loadInitialConfig() {
             document.body.classList.add('dark-mode');
             darkBtn.textContent = '☀️ 亮色模式';
         }
+        if (config.expanded_paths) {
+            expandedPaths = new Set(config.expanded_paths);
+        }
         if (config.posts_dir) {
             dirPathSpan.textContent = config.posts_dir;
             try {
-                await loadTree();
+                await loadTree();  // 渲染时根据 expandedPaths 展开
             } catch (e) {
-                console.log('上次目录可能已失效，需重新选择');
+                console.log('上次目录可能已失效');
             }
         }
     } catch (e) {
-        console.log('加载配置失败，使用默认设置');
+        console.log('加载配置失败', e);
     }
+}
+
+// 持久化展开路径
+function saveExpandedPaths() {
+    pywebview.api.save_expanded_paths(Array.from(expandedPaths));
 }
 
 // ========== 树结构构建 ==========
@@ -90,8 +100,14 @@ function renderTreeNode(parentUl, node) {
             e.stopPropagation();
             const childUl = li.querySelector(':scope > .children');
             if (childUl) {
-                const isOpen = childUl.classList.toggle('open');
-                toggle.textContent = isOpen ? '▼' : '▶';
+                const isNowOpen = childUl.classList.toggle('open');
+                toggle.textContent = isNowOpen ? '▼' : '▶';
+                if (isNowOpen) {
+                    expandedPaths.add(node.path);
+                } else {
+                    expandedPaths.delete(node.path);
+                }
+                saveExpandedPaths();
             }
         });
     } else {
@@ -120,6 +136,11 @@ function renderTreeNode(parentUl, node) {
     if (node.children && node.children.length > 0) {
         const childUl = document.createElement('ul');
         childUl.className = 'children';
+        // 根据 expandedPaths 判断是否初始打开
+        if (expandedPaths.has(node.path)) {
+            childUl.classList.add('open');
+            toggle.textContent = '▼';
+        }
         node.children.forEach(child => renderTreeNode(childUl, child));
         li.appendChild(childUl);
     }
@@ -170,11 +191,10 @@ function renderPreview(mdText) {
     } else {
         document.getElementById('preview-content').innerText = mdText;
     }
-    // 重置预览滚动位置
     document.getElementById('preview-area').scrollTop = 0;
 }
 
-// ---------- 编辑器事件（含自动保存） ----------
+// ---------- 编辑器事件 ----------
 function setupEditorEvents() {
     const editor = document.getElementById('markdown-editor');
     editor.addEventListener('input', () => {
@@ -190,11 +210,9 @@ async function saveCurrentArticle() {
     await pywebview.api.write_file(currentPath, content, 'page.md');
 }
 
-// ★ 滚动同步
 function setupSyncScroll() {
     const editor = document.getElementById('markdown-editor');
     const preview = document.getElementById('preview-area');
-
     editor.addEventListener('scroll', () => {
         if (syncScrollActive) return;
         syncScrollActive = true;
@@ -310,13 +328,17 @@ function onContextMenu(event, node, li) {
     addMenuItem(list, '新建文件夹', () => {
         const name = prompt('输入文件夹名称：');
         if (name) {
-            pywebview.api.create_folder(node.path, name).then(() => loadTree());
+            pywebview.api.create_folder(node.path, name).then(() => {
+                loadTree();  // 重建后展开状态由 expandedPaths 恢复
+            });
         }
     });
     addMenuItem(list, '新建文章', () => {
         const name = prompt('输入文章目录名称：');
         if (name) {
-            pywebview.api.create_article(node.path, name).then(() => loadTree());
+            pywebview.api.create_article(node.path, name).then(() => {
+                loadTree();
+            });
         }
     });
 
@@ -336,8 +358,15 @@ function onContextMenu(event, node, li) {
         addMenuItem(list, '删除文件夹及其内容', () => {
             if (confirm(`确定要删除整个文件夹“${node.name}”及其所有内容吗？此操作不可恢复！`)) {
                 pywebview.api.delete_item(node.path, 'directory').then(() => {
+                    // 删除路径会连带其子节点，从 expandedPaths 中移除相关前缀
+                    for (const p of expandedPaths) {
+                        if (p === node.path || p.startsWith(node.path + '/')) {
+                            expandedPaths.delete(p);
+                        }
+                    }
+                    saveExpandedPaths();
                     loadTree();
-                    if (currentPath === node.path) {
+                    if (currentPath === node.path || currentPath.startsWith(node.path + '/')) {
                         clearEditor();
                     }
                 });
@@ -415,6 +444,20 @@ async function onDrop(event) {
 
     try {
         await pywebview.api.move_item(dragSrcPath, destPath);
+        // 移动后原路径可能改变，为简化处理，我们清理与被移动路径相关的展开状态，保留目标路径的展开状态
+        // 更好的做法是递归更新所有包含原路径的 expandedPaths，但这里直接清除所有带原路径前缀的，然后添加目标路径前缀的。
+        const newPaths = new Set();
+        for (const p of expandedPaths) {
+            if (p === dragSrcPath || p.startsWith(dragSrcPath + '/')) {
+                // 替换为新的路径前缀
+                const newPath = destPath + '/' + srcNode.name + p.substring(dragSrcPath.length);
+                newPaths.add(newPath);
+            } else {
+                newPaths.add(p);
+            }
+        }
+        expandedPaths = newPaths;
+        saveExpandedPaths();
         await loadTree();
     } catch (e) {
         alert('移动失败：' + e);
@@ -458,7 +501,6 @@ function setupResizeHandles() {
         document.removeEventListener('mouseup', onMainMouseUp);
     }
 
-    // 预览分隔条（现在在 #editor-preview-wrapper 内）
     const previewHandle = document.getElementById('preview-resize-handle');
     const editorArea = document.getElementById('editor-area');
     const previewArea = document.getElementById('preview-area');

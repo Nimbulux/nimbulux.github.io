@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 文章编辑系统 - 后端
-使用 Tkinter 选择目录，支持配置记忆（上次目录 + 暗色模式）
+使用 Tkinter 选择目录，支持配置记忆（目录、暗色模式、展开路径）
 """
 
 import json
@@ -17,7 +17,6 @@ CONFIG_PATH = BASE_DIR / "editor_config.json"
 
 
 def load_config():
-    """读取配置文件，返回字典"""
     if CONFIG_PATH.exists():
         try:
             with open(CONFIG_PATH, "r", encoding="utf-8") as f:
@@ -28,7 +27,6 @@ def load_config():
 
 
 def save_config(config: dict):
-    """保存配置"""
     with open(CONFIG_PATH, "w", encoding="utf-8") as f:
         json.dump(config, f, indent=2, ensure_ascii=False)
 
@@ -37,7 +35,7 @@ class Api:
     def __init__(self):
         self.posts_dir = None
         self.dark_mode = False
-        # 尝试从配置恢复
+        self.expanded_paths = []
         cfg = load_config()
         if "posts_dir" in cfg:
             p = Path(cfg["posts_dir"])
@@ -45,12 +43,14 @@ class Api:
                 self.posts_dir = p
         if "dark_mode" in cfg:
             self.dark_mode = bool(cfg["dark_mode"])
+        if "expanded_paths" in cfg:
+            self.expanded_paths = cfg["expanded_paths"]
 
     def get_config(self):
-        """返回当前配置：目录路径和暗色模式"""
         return {
             "posts_dir": str(self.posts_dir) if self.posts_dir else "",
-            "dark_mode": self.dark_mode
+            "dark_mode": self.dark_mode,
+            "expanded_paths": self.expanded_paths
         }
 
     def select_directory(self):
@@ -65,15 +65,19 @@ class Api:
         root.destroy()
         if dir_path:
             self.posts_dir = Path(dir_path)
-            # 保存配置
-            save_config({"posts_dir": str(self.posts_dir), "dark_mode": self.dark_mode})
+            self.expanded_paths = []   # 切换目录清空展开状态
+            save_config({"posts_dir": str(self.posts_dir), "dark_mode": self.dark_mode, "expanded_paths": []})
             return str(self.posts_dir)
         return None
 
     def set_dark_mode(self, mode: bool):
-        """设置暗色模式并保存"""
         self.dark_mode = mode
-        save_config({"posts_dir": str(self.posts_dir) if self.posts_dir else "", "dark_mode": mode})
+        save_config({"posts_dir": str(self.posts_dir) if self.posts_dir else "", "dark_mode": mode, "expanded_paths": self.expanded_paths})
+
+    def save_expanded_paths(self, paths):
+        """保存前端传来的展开路径列表"""
+        self.expanded_paths = paths
+        save_config({"posts_dir": str(self.posts_dir) if self.posts_dir else "", "dark_mode": self.dark_mode, "expanded_paths": paths})
 
     def _check_dir(self):
         if not self.posts_dir:
@@ -122,7 +126,7 @@ class Api:
                     node["info"] = {"title": path.name}
             return node
 
-        assert isinstance(self.posts_dir,Path)
+        assert isinstance(self.posts_dir, Path)
         if not self.posts_dir.exists():
             self.posts_dir.mkdir(parents=True)
         root = build_tree(self.posts_dir, Path(""))
