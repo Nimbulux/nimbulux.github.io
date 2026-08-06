@@ -215,6 +215,45 @@
     ]
   },
   {
+    "name": "猫VS木头",
+    "type": "directory",
+    "relative_path": "小说/lan的小说/猫VS木头",
+    "children": [
+      {
+        "name": "沈知意又醒了",
+        "type": "article",
+        "relative_path": "小说/lan的小说/猫VS木头/沈知意又醒了",
+        "info": {
+          "title": "沈知意又醒了",
+          "date": "2026-08-07T13:38:00.000Z",
+          "tags": [
+            "木头",
+            "哈气",
+            "傲娇"
+          ],
+          "excerpt": "沈知意又醒了。",
+          "reading_time": 27
+        }
+      },
+      {
+        "name": "六月的苏州",
+        "type": "article",
+        "relative_path": "小说/lan的小说/猫VS木头/六月的苏州",
+        "info": {
+          "title": "六月的苏州",
+          "date": "2026-08-04T12:39:00.000Z",
+          "tags": [
+            "木头",
+            "哈气",
+            "傲娇"
+          ],
+          "excerpt": "六月的苏州，梅雨季赖着不走。雨从午后开始落，到黄昏也没停。",
+          "reading_time": 5
+        }
+      }
+    ]
+  },
+  {
     "name": "甜同甜",
     "type": "directory",
     "relative_path": "小说/lan的小说/甜同甜",
