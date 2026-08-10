@@ -327,6 +327,22 @@
             "relative_path": "小说/lan的小说/猫VS木头",
             "children": [
               {
+                "name": "晚上九点",
+                "type": "article",
+                "relative_path": "小说/lan的小说/猫VS木头/晚上九点",
+                "info": {
+                  "title": "晚上九点",
+                  "date": "2026-08-07T15:00:00.000Z",
+                  "excerpt": "晚上九点，例行号脉结束后，沈知意去浴室洗了澡。",
+                  "tags": [
+                    "木头",
+                    "哈气",
+                    "傲娇"
+                  ],
+                  "reading_time": 5
+                }
+              },
+              {
                 "name": "沈知意又醒了",
                 "type": "article",
                 "relative_path": "小说/lan的小说/猫VS木头/沈知意又醒了",
