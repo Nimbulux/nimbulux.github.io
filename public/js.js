@@ -7,6 +7,8 @@ function wrapPage() {
 
   iframe.src = `/app/?url=${window.location.pathname}`
 
+  console.debug("基本页面确认升级，请求路径",iframe.src)
+
   iframe.onload = function () {
     try {
       const doc = iframe.contentDocument || iframe.contentWindow.document;
@@ -56,4 +58,12 @@ function isModernBrowser() {
   );
 }
 
-//wrapPage();
+function inFrame() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const noLoad = urlParams.has("basic")
+  if (!noLoad) {
+    wrapPage();
+  }
+}
+
+//inFrame()
