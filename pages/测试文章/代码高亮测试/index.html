@@ -3,6 +3,10 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta charset="UTF-8">
+        <!-- 标准写法 -->
+        <link rel="icon" type="image/jpg" href="/public/favicon.jpg">
+        <!-- 兼容旧版IE -->
+        <link rel="shortcut icon" href="/public/favicon.jpg" type="image/x-icon">
         <title>云中霞光-文章浏览</title>
         <link rel="stylesheet" href="/public/css.css">
         <link rel="stylesheet" href="/public/md.css">
@@ -172,15 +176,15 @@
 <span class="normal">155</span>
 <span class="normal">156</span>
 <span class="normal">157</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/usr/bin/env python3</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 <span class="sd">自动构建文章页面：</span>
 <span class="sd">- 扫描 posts/ 目录，找到所有包含 page.md 和 info.json 的文章/项目目录</span>
 <span class="sd">- 将 page.md 转为 HTML，用 build/head.html + &lt;article&gt; + build/end.html 包裹</span>
 <span class="sd">- 复制文章目录下的其他文件到 pages/ 对应位置</span>
 <span class="sd">- 生成全局文章列表 pages/list.json</span>
 <span class="sd">- 为 posts/docs/ 下的每个项目生成独立的 pages/docs/项目X/list.json</span>
-<span class="sd">- 若项目目录本身包含 page.md 和 info.json，作为项目首页，在全局列表中标记 type: &quot;project&quot;</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">- 若项目目录本身包含 page.md 和 info.json，作为项目首页，在全局列表中标记 type: "project"</span>
+<span class="sd">"""</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
@@ -192,15 +196,15 @@
 
 
 <span class="c1"># 路径配置（相对于仓库根目录）</span>
-<span class="n">POSTS_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;posts&quot;</span><span class="p">)</span>
-<span class="n">OUTPUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;pages&quot;</span><span class="p">)</span>          <span class="c1"># 所有页面输出到此</span>
-<span class="n">HEAD_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;build/head.html&quot;</span><span class="p">)</span>
-<span class="n">END_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;build/end.html&quot;</span><span class="p">)</span>
-<span class="n">DOCS_LIST_DIR</span> <span class="o">=</span> <span class="n">OUTPUT_DIR</span> <span class="o">/</span> <span class="s2">&quot;docs&quot;</span> <span class="c1"># 项目列表的根目录，即 pages/docs</span>
+<span class="n">POSTS_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"posts"</span><span class="p">)</span>
+<span class="n">OUTPUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"pages"</span><span class="p">)</span>          <span class="c1"># 所有页面输出到此</span>
+<span class="n">HEAD_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"build/head.html"</span><span class="p">)</span>
+<span class="n">END_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"build/end.html"</span><span class="p">)</span>
+<span class="n">DOCS_LIST_DIR</span> <span class="o">=</span> <span class="n">OUTPUT_DIR</span> <span class="o">/</span> <span class="s2">"docs"</span> <span class="c1"># 项目列表的根目录，即 pages/docs</span>
 
 <span class="c1"># 读取模板</span>
-<span class="n">head_html</span> <span class="o">=</span> <span class="n">HEAD_PATH</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-<span class="n">end_html</span> <span class="o">=</span> <span class="n">END_PATH</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+<span class="n">head_html</span> <span class="o">=</span> <span class="n">HEAD_PATH</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+<span class="n">end_html</span> <span class="o">=</span> <span class="n">END_PATH</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
 
 <span class="c1"># Markdown 转换器</span>
 <span class="n">md</span> <span class="o">=</span> <span class="n">markdown</span><span class="o">.</span><span class="n">Markdown</span><span class="p">()</span>
@@ -212,45 +216,45 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">calculate_reading_time</span><span class="p">(</span><span class="n">md_text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;简单按字符数估算阅读时长（分钟），最低 1 分钟&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""简单按字符数估算阅读时长（分钟），最低 1 分钟"""</span>
     <span class="n">chars</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">md_text</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">isalnum</span><span class="p">()</span> <span class="ow">or</span> <span class="nb">ord</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">127</span><span class="p">)</span>
     <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">chars</span> <span class="o">/</span> <span class="mi">500</span><span class="p">))</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">process_article</span><span class="p">(</span><span class="n">article_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;处理单个文章/项目首页目录&quot;&quot;&quot;</span>
-    <span class="n">info_file</span> <span class="o">=</span> <span class="n">article_dir</span> <span class="o">/</span> <span class="s2">&quot;info.json&quot;</span>
-    <span class="n">page_file</span> <span class="o">=</span> <span class="n">article_dir</span> <span class="o">/</span> <span class="s2">&quot;page.md&quot;</span>
+<span class="w">    </span><span class="sd">"""处理单个文章/项目首页目录"""</span>
+    <span class="n">info_file</span> <span class="o">=</span> <span class="n">article_dir</span> <span class="o">/</span> <span class="s2">"info.json"</span>
+    <span class="n">page_file</span> <span class="o">=</span> <span class="n">article_dir</span> <span class="o">/</span> <span class="s2">"page.md"</span>
 
     <span class="c1"># 读取元数据</span>
-    <span class="k">with</span> <span class="n">info_file</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">info_file</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"r"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">info</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
     <span class="c1"># 确定最后修改时间</span>
-    <span class="n">last_modified</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;updated&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span>
+    <span class="n">last_modified</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"updated"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">info</span><span class="p">[</span><span class="s2">"date"</span><span class="p">]</span>
 
     <span class="c1"># 计算阅读时间（如果未提供）</span>
-    <span class="k">if</span> <span class="s2">&quot;reading_time&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">info</span><span class="p">:</span>
-        <span class="n">md_content</span> <span class="o">=</span> <span class="n">page_file</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-        <span class="n">info</span><span class="p">[</span><span class="s2">&quot;reading_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calculate_reading_time</span><span class="p">(</span><span class="n">md_content</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">"reading_time"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">info</span><span class="p">:</span>
+        <span class="n">md_content</span> <span class="o">=</span> <span class="n">page_file</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+        <span class="n">info</span><span class="p">[</span><span class="s2">"reading_time"</span><span class="p">]</span> <span class="o">=</span> <span class="n">calculate_reading_time</span><span class="p">(</span><span class="n">md_content</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">md_content</span> <span class="o">=</span> <span class="n">page_file</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+        <span class="n">md_content</span> <span class="o">=</span> <span class="n">page_file</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
 
     <span class="c1"># Markdown → HTML</span>
     <span class="n">body_html</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">md_content</span><span class="p">)</span>
-    <span class="n">full_html</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">head_html</span><span class="si">}</span><span class="s2">&lt;article&gt;</span><span class="si">{</span><span class="n">body_html</span><span class="si">}</span><span class="s2">&lt;/article&gt;</span><span class="si">{</span><span class="n">end_html</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">full_html</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">head_html</span><span class="si">}</span><span class="s2">&lt;article&gt;</span><span class="si">{</span><span class="n">body_html</span><span class="si">}</span><span class="s2">&lt;/article&gt;</span><span class="si">{</span><span class="n">end_html</span><span class="si">}</span><span class="s2">"</span>
 
     <span class="c1"># 计算相对于 posts/ 的路径</span>
-    <span class="n">relative_path</span> <span class="o">=</span> <span class="n">article_dir</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">POSTS_DIR</span><span class="p">)</span>  <span class="c1"># 例如 &quot;posts/技术/文章名&quot; 或 &quot;docs/项目X/大类/文章&quot; 或 &quot;docs/项目X&quot;</span>
+    <span class="n">relative_path</span> <span class="o">=</span> <span class="n">article_dir</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">POSTS_DIR</span><span class="p">)</span>  <span class="c1"># 例如 "posts/技术/文章名" 或 "docs/项目X/大类/文章" 或 "docs/项目X"</span>
     <span class="n">dest_dir</span> <span class="o">=</span> <span class="n">OUTPUT_DIR</span> <span class="o">/</span> <span class="n">relative_path</span>
     <span class="n">dest_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="c1"># 写入 index.html</span>
-    <span class="p">(</span><span class="n">dest_dir</span> <span class="o">/</span> <span class="s2">&quot;index.html&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">full_html</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">dest_dir</span> <span class="o">/</span> <span class="s2">"index.html"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">full_html</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
 
     <span class="c1"># 复制其他文件</span>
     <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">article_dir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">():</span>
-        <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;page.md&quot;</span><span class="p">,</span> <span class="s2">&quot;info.json&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"page.md"</span><span class="p">,</span> <span class="s2">"info.json"</span><span class="p">):</span>
             <span class="k">continue</span>
         <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
             <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">dest_dir</span> <span class="o">/</span> <span class="n">item</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
@@ -263,23 +267,23 @@
     <span class="c1"># 构建文章条目，添加网页路径</span>
     <span class="n">article_entry</span> <span class="o">=</span> <span class="p">{</span>
         <span class="o">**</span><span class="n">info</span><span class="p">,</span>
-        <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;/pages/</span><span class="si">{</span><span class="n">relative_path</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span><span class="si">}</span><span class="s2">/&quot;</span>
+        <span class="s2">"path"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"/pages/</span><span class="si">{</span><span class="n">relative_path</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span><span class="si">}</span><span class="s2">/"</span>
     <span class="p">}</span>
 
     <span class="c1"># 判断是否为项目首页（即 docs/项目X 本身，只有两级）</span>
     <span class="n">parts</span> <span class="o">=</span> <span class="n">relative_path</span><span class="o">.</span><span class="n">parts</span>
-    <span class="n">is_project_home</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;docs&quot;</span>
+    <span class="n">is_project_home</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"docs"</span>
 
     <span class="k">if</span> <span class="n">is_project_home</span><span class="p">:</span>
         <span class="c1"># 项目首页，标记类型</span>
-        <span class="n">article_entry</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;project&quot;</span>
+        <span class="n">article_entry</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"project"</span>
         <span class="c1"># 只加入全局列表，不加入项目文章分组</span>
         <span class="n">all_articles</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">article_entry</span><span class="p">,</span> <span class="n">last_modified</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># 普通文章，加入全局列表</span>
         <span class="n">all_articles</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">article_entry</span><span class="p">,</span> <span class="n">last_modified</span><span class="p">))</span>
         <span class="c1"># 如果属于 docs 下的某个项目，加入对应的项目分组</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;docs&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"docs"</span><span class="p">:</span>
             <span class="n">project_name</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>   <span class="c1"># docs/项目X</span>
             <span class="n">project_articles</span><span class="p">[</span><span class="n">project_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">article_entry</span><span class="p">,</span> <span class="n">last_modified</span><span class="p">))</span>
 
@@ -293,21 +297,21 @@
     <span class="c1"># 递归扫描 posts 目录</span>
     <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">POSTS_DIR</span><span class="p">):</span>
         <span class="n">root_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s2">&quot;page.md&quot;</span> <span class="ow">in</span> <span class="n">files</span> <span class="ow">and</span> <span class="s2">&quot;info.json&quot;</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">"page.md"</span> <span class="ow">in</span> <span class="n">files</span> <span class="ow">and</span> <span class="s2">"info.json"</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
             <span class="n">process_article</span><span class="p">(</span><span class="n">root_path</span><span class="p">)</span>
             <span class="n">dirs</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>   <span class="c1"># 文章目录下不再深入</span>
 
     <span class="c1"># 按最后修改时间降序排序</span>
-    <span class="n">sort_key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">item</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;Z&quot;</span><span class="p">,</span> <span class="s2">&quot;+00:00&quot;</span><span class="p">))</span>
+    <span class="n">sort_key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">item</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"Z"</span><span class="p">,</span> <span class="s2">"+00:00"</span><span class="p">))</span>
     <span class="n">all_articles</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">sort_key</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="n">project_articles</span><span class="p">:</span>
         <span class="n">project_articles</span><span class="p">[</span><span class="n">proj</span><span class="p">]</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">sort_key</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="c1"># 生成全局列表</span>
     <span class="n">global_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">entry</span> <span class="k">for</span> <span class="n">entry</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">all_articles</span><span class="p">]</span>
-    <span class="p">(</span><span class="n">OUTPUT_DIR</span> <span class="o">/</span> <span class="s2">&quot;list.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
+    <span class="p">(</span><span class="n">OUTPUT_DIR</span> <span class="o">/</span> <span class="s2">"list.json"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
         <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">global_list</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
-        <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span>
+        <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span>
     <span class="p">)</span>
 
     <span class="c1"># 生成各项目文章列表（不含项目首页）</span>
@@ -316,17 +320,17 @@
         <span class="n">proj_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">entry</span> <span class="k">for</span> <span class="n">entry</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">articles</span><span class="p">]</span>
         <span class="n">list_dir</span> <span class="o">=</span> <span class="n">DOCS_LIST_DIR</span> <span class="o">/</span> <span class="n">proj_name</span>
         <span class="n">list_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="p">(</span><span class="n">list_dir</span> <span class="o">/</span> <span class="s2">&quot;list.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">list_dir</span> <span class="o">/</span> <span class="s2">"list.json"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
             <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">proj_list</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
-            <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span>
+            <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span>
         <span class="p">)</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;构建完成！总文章/页面数：</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">global_list</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"构建完成！总文章/页面数：</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">global_list</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">proj_name</span><span class="p">,</span> <span class="n">articles</span> <span class="ow">in</span> <span class="n">project_articles</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  - 项目 &#39;</span><span class="si">{</span><span class="n">proj_name</span><span class="si">}</span><span class="s2">&#39;：</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">articles</span><span class="p">)</span><span class="si">}</span><span class="s2"> 篇文章&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  - 项目 '</span><span class="si">{</span><span class="n">proj_name</span><span class="si">}</span><span class="s2">'：</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">articles</span><span class="p">)</span><span class="si">}</span><span class="s2"> 篇文章"</span><span class="p">)</span>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>

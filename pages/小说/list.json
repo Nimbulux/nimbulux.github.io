@@ -225,6 +225,38 @@
         "relative_path": "小说/lan的小说/猫VS木头",
         "children": [
           {
+            "name": "木头上怎么长猫了",
+            "type": "article",
+            "relative_path": "小说/lan的小说/猫VS木头/木头上怎么长猫了",
+            "info": {
+              "title": "木头上怎么长猫了",
+              "date": "2026-08-16T03:04:00.000Z",
+              "excerpt": "沈知意又哭了。她自己不知道。\n",
+              "tags": [
+                "木头",
+                "哈气",
+                "傲娇"
+              ],
+              "reading_time": 16
+            }
+          },
+          {
+            "name": "木头上怎么能长猫呢",
+            "type": "article",
+            "relative_path": "小说/lan的小说/猫VS木头/木头上怎么能长猫呢",
+            "info": {
+              "title": "木头上怎么能长猫呢",
+              "date": "2026-08-15T15:29:00.000Z",
+              "excerpt": "木头上怎么能长猫呢",
+              "tags": [
+                "木头",
+                "哈气",
+                "傲娇"
+              ],
+              "reading_time": 26
+            }
+          },
+          {
             "name": "第二天早上",
             "type": "article",
             "relative_path": "小说/lan的小说/猫VS木头/第二天早上",
