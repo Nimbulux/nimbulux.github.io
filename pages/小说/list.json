@@ -510,6 +510,192 @@
         ]
       },
       {
+        "name": "爱橙TV",
+        "type": "mixed",
+        "relative_path": "小说/lan的小说/爱橙TV",
+        "info": {
+          "title": "爱橙TV",
+          "date": "2026-09-11T22:46:00.000Z",
+          "excerpt": "表达了作者对上学的厌恶之情",
+          "tags": [
+            "文件夹"
+          ],
+          "reading_time": 1
+        },
+        "children": [
+          {
+            "name": "爱橙TV第二章合订版",
+            "type": "article",
+            "relative_path": "小说/lan的小说/爱橙TV/爱橙TV第二章合订版",
+            "info": {
+              "title": "爱橙TV第二章合订版",
+              "date": "2026-09-10T16:40:00.000Z",
+              "tags": [
+                "刀",
+                "校园"
+              ],
+              "excerpt": "我又回到了这间教室。",
+              "reading_time": 58
+            }
+          },
+          {
+            "name": "爱橙TV第一章合订版",
+            "type": "article",
+            "relative_path": "小说/lan的小说/爱橙TV/爱橙TV第一章合订版",
+            "info": {
+              "title": "爱橙TV第一章合订版",
+              "date": "2026-09-06T15:36:00.000Z",
+              "tags": [
+                "刀",
+                "校园"
+              ],
+              "excerpt": "雨的味道先于意识抵达。",
+              "reading_time": 68
+            }
+          }
+        ]
+      },
+      {
+        "name": "键盘手是女装大佬",
+        "type": "mixed",
+        "relative_path": "小说/lan的小说/键盘手是女装大佬",
+        "info": {
+          "title": "键盘手是女装大佬",
+          "date": "2026-09-11T22:35:00.000Z",
+          "tags": [
+            "文件夹"
+          ],
+          "excerpt": "随机吧小说第二本",
+          "reading_time": 1
+        },
+        "children": [
+          {
+            "name": "蓝裙子",
+            "type": "article",
+            "relative_path": "小说/lan的小说/键盘手是女装大佬/蓝裙子",
+            "info": {
+              "title": "蓝裙子",
+              "date": "2026-08-31T14:58:00.000Z",
+              "tags": [
+                "女装",
+                "乐队",
+                "随机吧小说"
+              ],
+              "excerpt": "闹钟响起来的时候，我在黑暗中睁着眼睛，早就醒了。",
+              "reading_time": 14
+            }
+          },
+          {
+            "name": "午休、食堂",
+            "type": "article",
+            "relative_path": "小说/lan的小说/键盘手是女装大佬/午休、食堂",
+            "info": {
+              "title": "午休、食堂",
+              "date": "2026-08-31T14:57:00.000Z",
+              "tags": [
+                "女装",
+                "乐队",
+                "随机吧小说"
+              ],
+              "excerpt": "周二晚上，我刚做完英语作业，正准备把最后一道翻译题收尾，手机在桌上震了一下。",
+              "reading_time": 14
+            }
+          },
+          {
+            "name": "购物中心",
+            "type": "article",
+            "relative_path": "小说/lan的小说/键盘手是女装大佬/购物中心",
+            "info": {
+              "title": "购物中心",
+              "date": "2026-08-31T10:48:00.000Z",
+              "excerpt": "周一早晨的闹钟响起来的时候，我正梦到自己在弹一架没有声音的钢琴。",
+              "tags": [
+                "女装",
+                "乐队",
+                "随机吧小说"
+              ],
+              "reading_time": 17
+            }
+          },
+          {
+            "name": "女子乐队",
+            "type": "article",
+            "relative_path": "小说/lan的小说/键盘手是女装大佬/女子乐队",
+            "info": {
+              "title": "女子乐队",
+              "date": "2026-08-30T16:15:00.000Z",
+              "tags": [
+                "女装",
+                "乐队",
+                "随机吧小说"
+              ],
+              "excerpt": "我醒了。天还没有完全亮透，房间里的光线是青白色的，带着一种清晨特有的凉意。",
+              "reading_time": 24
+            }
+          },
+          {
+            "name": "键盘手是女装大佬",
+            "type": "article",
+            "relative_path": "小说/lan的小说/键盘手是女装大佬/键盘手是女装大佬",
+            "info": {
+              "title": "键盘手是女装大佬",
+              "date": "2026-08-30T12:46:00.000Z",
+              "excerpt": "四月的东京，樱花已经落得差不多了。",
+              "tags": [
+                "女装",
+                "乐队",
+                "随机吧小说"
+              ],
+              "reading_time": 15
+            }
+          }
+        ]
+      },
+      {
+        "name": "随机01",
+        "type": "mixed",
+        "relative_path": "小说/lan的小说/随机01",
+        "info": {
+          "title": "随机01",
+          "date": "2026-08-18T13:39:00.000Z",
+          "excerpt": "随机吧小说的第一本",
+          "tags": [
+            "文件夹"
+          ],
+          "reading_time": 1
+        },
+        "children": [
+          {
+            "name": "从第四声钟里活下来之后的第七天",
+            "type": "article",
+            "relative_path": "小说/lan的小说/随机01/从第四声钟里活下来之后的第七天",
+            "info": {
+              "title": "从第四声钟里活下来之后的第七天",
+              "date": "2026-08-21T16:57:00.000Z",
+              "excerpt": "第四声钟里活下来之后的第七天，我和沈青梧又见面了。",
+              "tags": [
+                "随机吧小说"
+              ],
+              "reading_time": 44
+            }
+          },
+          {
+            "name": "随机吧小说",
+            "type": "article",
+            "relative_path": "小说/lan的小说/随机01/随机吧小说",
+            "info": {
+              "title": "随机吧小说",
+              "date": "2026-08-19T13:39:00.000Z",
+              "excerpt": "我第一次见沈青梧，是在车祸现场。",
+              "tags": [
+                "随机吧小说"
+              ],
+              "reading_time": 34
+            }
+          }
+        ]
+      },
+      {
         "name": "无名小说1-弃坑",
         "type": "mixed",
         "relative_path": "小说/lan的小说/无名小说1-弃坑",
