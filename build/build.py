@@ -27,6 +27,7 @@ HOME_TEMPLATE_PATH = TEMPLATES_DIR / "home.html"
 DETAIL_TEMPLATE_PATH = TEMPLATES_DIR / "detail.html"   # 混合目录模板
 
 INDEX_OUTPUT_PATH = Path("index.html")
+POSTS_OUTPUT_PATH = OUTPUT_DIR / "index.html"
 
 PUBLIC_DIR = Path("public")
 
@@ -294,6 +295,7 @@ def generate_site(node: dict):
         if rel == "":
             # 根文章：HTML 写到根目录的 index.html，附件仍放在 pages 下（便于统一管理）
             render_article_page(node, OUTPUT_DIR, html_output_path=INDEX_OUTPUT_PATH)
+            render_article_page(node, OUTPUT_DIR, html_output_path=POSTS_OUTPUT_PATH)
         else:
             out_dir = OUTPUT_DIR / rel
             render_article_page(node, out_dir)
