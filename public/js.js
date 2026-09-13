@@ -39,8 +39,13 @@ function upNewPage() {
 
 if (upNewPage()) {
   if (isModernBrowser()) {
-    const src = `/app/docs/article?path={window.location.pathname.replace("/pages/","/")}`;
-    window.location.replace(src.toString());
+    const url = window.location.pathname
+    if (url.includes('pages')) {
+      const src = "/app/docs/article?path=" + url.replace("/pages/","/");
+      window.location.replace(src.toString());
+    } else {
+      window.location.replace("/app")
+    }
   }
 } else {
   document.querySelectorAll('a[href]').forEach(link => {
@@ -48,8 +53,8 @@ if (upNewPage()) {
   if (!href || /^(#|javascript:|mailto:|tel:)/i.test(href)) return;
 
   const url = new URL(href, window.location.origin);
-  if (!url.searchParams.has('xxx')) {
-    url.search = url.search ? url.search + '&xxx' : '?xxx';
+  if (!url.searchParams.has('basic')) {
+    url.search = url.search ? url.search + '&basic' : '?basic';
   }
   link.setAttribute('href', url.pathname + url.search + url.hash);
 });
