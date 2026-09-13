@@ -307,6 +307,7 @@ def main():
     if OUTPUT_DIR.exists():
         shutil.rmtree(OUTPUT_DIR)
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    PUBLIC_DIR.mkdir(parents=True, exist_ok=True)
 
     if not POSTS_DIR.exists():
         print("❌ 错误：posts 目录不存在！")
