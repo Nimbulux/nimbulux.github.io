@@ -48,7 +48,7 @@ md = markdown.Markdown(
 
 # ========== 工具函数 ==========
 
-def url_jpg_to_ico(url, output_path, save_path=None):
+def url_jpg_to_ico(url, output_path=None, save_path=None):
     """
     从URL下载JPG图像并转换为ICO文件。
 
@@ -64,16 +64,17 @@ def url_jpg_to_ico(url, output_path, save_path=None):
         with open(save_path, 'wb') as f:
             f.write(resp.content)
 
-    img = Image.open(BytesIO(resp.content))
+    if output_path:
+        img = Image.open(BytesIO(resp.content))
 
-    # 确保为RGBA模式（ICO支持透明度，JPG无透明但可转换）
-    if img.mode != 'RGBA':
-        img = img.convert('RGBA')
+        # 确保为RGBA模式（ICO支持透明度，JPG无透明但可转换）
+        if img.mode != 'RGBA':
+            img = img.convert('RGBA')
 
-    # 标准图标尺寸
-    sizes = [(16, 16), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)]
+        # 标准图标尺寸
+        sizes = [(16, 16), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)]
 
-    img.save(output_path, format='ICO', sizes=sizes)
+        img.save(output_path, format='ICO', sizes=sizes)
 
 def calculate_reading_time(md_text: str) -> int:
     chars = sum(1 for c in md_text if c.isalnum() or ord(c) > 127)
@@ -337,6 +338,7 @@ def main():
     print(f"开始获取并转换首页图像")
     try:
         url_jpg_to_ico("https://q1.qlogo.cn/g?b=qq&nk=2121402422&s=640",ICO_OUTPUT_PATH,JPG_OUTPUT_PATH)
+        url_jpg_to_ico("https://q1.qlogo.cn/g?b=qq&nk=2637169541&s=640",None,PUBLIC_DIR / "lan.jpg")
     except Exception as e:
         print(f"❌ 错误：获取图片时发生下列错误:\n{e}")
 
