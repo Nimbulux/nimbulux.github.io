@@ -1,27 +1,3 @@
-function wrapPage() {
-  if (!isModernBrowser()) return;
-  const iframe = document.createElement('iframe');
-  iframe.style.display = 'none';
-
-  document.body.appendChild(iframe);
-
-  iframe.src = `/app/?url=${window.location.pathname}`
-
-  iframe.onload = function () {
-    try {
-      const doc = iframe.contentDocument || iframe.contentWindow.document;
-      // 获取完整 HTML 字符串
-      const newHTML = doc.documentElement.outerHTML;
-
-      document.open();
-      document.write(newHTML);
-      document.close();
-    } catch (e) {
-      console.warn('无法读取 iframe 内容', e);
-    }
-  };
-}
-
 function isModernBrowser() {
   // 检测 CSS 能力（使用 CSS.supports）
   const supportsFlex = CSS.supports('display', 'flex');
@@ -56,4 +32,25 @@ function isModernBrowser() {
   );
 }
 
-//wrapPage();
+function upNewPage() {
+  const url = new URL(window.location.href);
+  return !url.searchParams.has('basic');
+}
+
+if (upNewPage()) {
+  if (isModernBrowser()) {
+    const src = `/app/docs/article?path={window.location.pathname.replace("/pages/","/")}`;
+    window.location.replace(src.toString());
+  }
+} else {
+  document.querySelectorAll('a[href]').forEach(link => {
+  const href = link.getAttribute('href');
+  if (!href || /^(#|javascript:|mailto:|tel:)/i.test(href)) return;
+
+  const url = new URL(href, window.location.origin);
+  if (!url.searchParams.has('xxx')) {
+    url.search = url.search ? url.search + '&xxx' : '?xxx';
+  }
+  link.setAttribute('href', url.pathname + url.search + url.hash);
+});
+}
