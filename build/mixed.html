@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="{{LANG}}">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{TITLE}}</title>
+{{META}}
+{{HEAD_LINKS}}
+<!-- @slot:head -->
+</head>
+<body>
+<!-- @slot:body-top -->
+<div id="docs" class="docs docs--mixed">
+
+  <div class="docs-nav">
+    {{BREADCRUMB}}
+  </div>
+
+  <div class="docs-header">
+    <h1 class="docs-title">{{DOC_TITLE}}</h1>
+    <div class="docs-meta">{{DOC_META}}</div>
+  </div>
+
+  <div class="docs-content">
+{{CONTENT}}
+  </div>
+
+  <h2 class="docs-section">目录</h2>
+  <ul class="docs-list">
+{{CHILDREN}}
+  </ul>
+
+  <!-- @slot:mixed-footer -->
+</div>
+<!-- @slot:body-bottom -->
+</body>
+</html>

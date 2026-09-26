@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="{{LANG}}">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{TITLE}}</title>
+{{META}}
+{{HEAD_LINKS}}
+<!-- @slot:head -->
+</head>
+<body>
+<!-- @slot:body-top -->
+<div id="docs" class="docs docs--article">
+
+  <div class="docs-nav">
+    {{BREADCRUMB}}
+  </div>
+
+  <div class="docs-header">
+    <h1 class="docs-title">{{DOC_TITLE}}</h1>
+    <div class="docs-meta">{{DOC_META}}</div>
+  </div>
+
+  <div class="docs-content">
+{{CONTENT}}
+  </div>
+
+  <!-- @slot:article-footer -->
+</div>
+<!-- @slot:body-bottom -->
+</body>
+</html>
