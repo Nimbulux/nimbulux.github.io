@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>对于元素的感悟 - Nimbulux_</title>
+<meta name="description" content="Nimbulux_ 的 文档库文章">
+<meta property="og:site_name" content="Nimbulux_">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:title" content="对于元素的感悟 - Nimbulux_">
+<meta property="og:description" content="Nimbulux_ 的 文档库文章">
+<meta property="og:url" content="https://nimbulux.github.io/pages/感想/网页相关/对于元素的感悟/">
+<meta property="og:image" content="/resources/favicon.jpg">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="对于元素的感悟 - Nimbulux_">
+<meta name="twitter:description" content="Nimbulux_ 的 文档库文章">
+<meta name="twitter:image" content="/resources/favicon.jpg">
+<link rel="canonical" href="https://nimbulux.github.io/pages/感想/网页相关/对于元素的感悟/">
+<link rel="icon" type="image/jpeg" href="/resources/favicon.jpg">
+<!-- @slot:head -->
+</head>
+<body>
+<!-- @slot:body-top -->
+<div id="docs" class="docs docs--article">
+
+  <div class="docs-nav">
+    <a href="/pages/">首页</a> &gt; <a href="/pages/感想/">感想</a> &gt; <a href="/pages/感想/网页相关/">网页相关</a> &gt; <span>对于元素的感悟</span>
+  </div>
+
+  <div class="docs-header">
+    <h1 class="docs-title">对于元素的感悟</h1>
+    <div class="docs-meta"></div>
+  </div>
+
+  <div class="docs-content">
+<p>元素中class和id怎么使用，和css与JavaScript的使用的相关性。</p>
+
+<h2 id="起因">起因</h2>
+
+<p>在与AI对话的过程中，我向她询问网页的设计相关问题。<br>
+灵感的来源就在多个对话中。<br>
+在要用到JavaScript功能的页面中，元素的引用几乎都是id索引，<br>
+而在美化也就是使用css为主的页面中，我发现元素身上基本都是class。<br>
+这个发现引起了我的注意，我在脑中记下了。</p>
+
+<h2 id="经过">经过</h2>
+
+<p>在后续进一步美化的过程中，我发现她的示例代码中对于元素隐藏的控制...<br>
+她在相关代码中使用JavaScript操作了元素的class值，并且强调了前方有空格。<br>
+这让我想起我小时候翻看网站代码的时候。<br>
+小时候的我发现class中有好几个词条用空格间隔，<br>
+而每个元素对应的id却只有一个，并且命名中也没有<code>-</code>之类的符号。</p>
+
+<h2 id="发现">发现</h2>
+
+<p>我向她开始询问相关事项:<br>
+&gt;</p>
+
+<blockquote>
+  <ul>
+  <li><p><strong>Q: 关于id和class是否有命名规范？</strong><br>
+  A:</p>
+  
+  <div class="codehilite">
+<pre><span></span><code>不算规范，是命名的建议与习惯。
+因为css的内部样式都是词与词间`-`号链接，
+而JavaScript中内部命名是以`驼峰`的样式。
+于是形成了相关的命名。
+</code></pre>
+  </div></li>
+  <li><p><strong>Q: 关于class与id是否可以理解为一个用于css一个用于id</strong><br>
+  A:</p>
+  
+  <div class="codehilite">
+<pre><span></span><code>可以这么理解。
+class命名可重复
+id命名唯一
+</code></pre>
+  </div></li>
+  </ul>
+</blockquote>
+
+<h2 id="结论">结论</h2>
+
+<p>*<em>本人观点哦，不要当成圣经!</em></p>
+
+<h3 id="感悟">感悟</h3>
+
+<p>id像是元素的标识 是每个对象的"身份证"<br>
+class像是元素的标签 是用来给对象分类的</p>
+
+<h3 id="技巧">技巧</h3>
+
+<p>对于class的操作<br>
+其实每个对象有classList<br>
+JavaScript可以直接进行 切换、删除、添加等 操作<br>
+不必像AI说的一样用字符串操作<br>
+在以后有相关的代码可以注意一下</p>
+
+  </div>
+
+  <!-- @slot:article-footer -->
+</div>
+<!-- @slot:body-bottom -->
+</body>
+</html>
