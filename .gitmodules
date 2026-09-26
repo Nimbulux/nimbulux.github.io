@@ -1,0 +1,4 @@
+[submodule "Website_Docs"]
+	path = Website_Docs
+	url = https://github.com/Nimbulux/Website_Docs.git
+	branch = main
