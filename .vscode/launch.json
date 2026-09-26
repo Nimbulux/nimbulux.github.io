@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "🚀 启动 Firefox 预览",
+      "type": "firefox",
+      "request": "launch",
+      "url": "http://localhost:5500",
+      "webRoot": "${workspaceFolder}",
+      "preLaunchTask": "Start Live Server",
+      "postDebugTask": "Stop Live Server",
+      "reAttach": true,
+      "pathMappings": [
+        {
+          "url": "http://localhost:5500",
+          "path": "${workspaceFolder}"
+        }
+      ]
+    },
+    {
+      "name": "🐍 调试 Python 脚本",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    }
+  ]
+}
