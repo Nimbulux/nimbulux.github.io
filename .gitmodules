@@ -2,3 +2,7 @@
 	path = posts
 	url = https://github.com/Nimbulux/Website_Docs.git
 	branch = main
+[submodule "app"]
+	path = app
+	url = https://github.com/Nimbulux/Nimbulux_Blog.git
+	branch = main
